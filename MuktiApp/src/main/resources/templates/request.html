@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Food & Warmth | MUKTI APP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link th:href="@{/css/global.css}" rel="stylesheet">
+    <meta name="user-phone" th:content="${session.user != null ? session.user.phone : ''}">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-light: #34D399;
+            --primary-dark: #059669;
+            --secondary: #F59E0B;
+            --secondary-light: #FCD34D;
+            --purple: #8B5CF6;
+            --purple-light: #c4b5fd;
+            --purple-dark: #6d28d9;
+            --accent: #F97316;
+            --dark: #0f172a;
+            --dark-warm: #120e0a;
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: blur(20px);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --radius-xl: 32px;
+            --radius-lg: 20px;
+            --radius-pill: 50px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', 'Inter', 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #24160e, #120e0a);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            padding: 32px 40px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .back-btn {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            border: 1px solid var(--glass-border);
+            flex-shrink: 0;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(-4px);
+        }
+
+        .header-content h1 {
+            font-size: 1.85rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .header-content p {
+            color: var(--text-muted);
+            font-size: 0.98rem;
+        }
+
+        /* 2 Distinct Interactive Hero Request Carts */
+        .cart-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .cart-switch-card {
+            padding: 30px 26px 24px;
+            border-radius: var(--radius-xl);
+            border: 2px solid var(--glass-border);
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .cart-switch-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .cart-switch-card.food-request-cart {
+            border-color: rgba(16, 185, 129, 0.35);
+            background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.12), rgba(10, 18, 14, 0.95));
+        }
+
+        .cart-switch-card.food-request-cart:hover,
+        .cart-switch-card.food-request-cart.active {
+            border-color: #10b981;
+            background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.12), rgba(10, 18, 14, 0.95));
+            box-shadow: 0 14px 36px rgba(16, 185, 129, 0.35);
+        }
+
+        .cart-switch-card.other-request-cart {
+            border-color: rgba(236, 72, 153, 0.35);
+            background: radial-gradient(circle at top right, rgba(236, 72, 153, 0.12), rgba(18, 10, 20, 0.95));
+        }
+
+        .cart-switch-card.other-request-cart:hover,
+        .cart-switch-card.other-request-cart.active {
+            border-color: #ec4899;
+            background: radial-gradient(circle at top right, rgba(236, 72, 153, 0.25), rgba(190, 24, 93, 0.12), rgba(18, 10, 20, 0.95));
+            box-shadow: 0 14px 36px rgba(236, 72, 153, 0.35);
+        }
+
+        .cart-card-ribbon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 5px 14px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ribbon-food {
+            background: linear-gradient(90deg, #10b981, #059669);
+            color: white;
+        }
+
+        .ribbon-others {
+            background: linear-gradient(90deg, #ec4899, #be185d);
+            color: white;
+        }
+
+        .cs-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .cs-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .food-icon {
+            background: rgba(16, 185, 129, 0.18);
+            color: var(--primary-light);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .other-icon {
+            background: rgba(236, 72, 153, 0.18);
+            color: #f472b6;
+            border: 1px solid rgba(236, 72, 153, 0.4);
+        }
+
+        .cs-badge {
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .food-pill {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .other-pill {
+            background: rgba(236, 72, 153, 0.2);
+            color: #fbcfe8;
+            border: 1px solid rgba(236, 72, 153, 0.4);
+        }
+
+        .cs-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 6px;
+        }
+
+        .cs-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        .cs-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding-top: 14px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .cs-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cs-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .food-request-cart .cs-dot {
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .other-request-cart .cs-dot {
+            background: #ec4899;
+            box-shadow: 0 0 8px #ec4899;
+        }
+
+        .cs-btn-text {
+            font-size: 0.82rem;
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .cart-switch-card.active .cs-btn-text {
+            background: white;
+            color: #120e0a;
+            font-weight: 800;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.55fr;
+            gap: 28px;
+        }
+
+        .info-panel {
+            padding: 32px;
+            height: fit-content;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 22px;
+            color: var(--secondary-light);
+            letter-spacing: -0.5px;
+        }
+
+        .tips-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .tips-list li {
+            display: flex;
+            gap: 14px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+        }
+
+        .tip-icon {
+            width: 38px;
+            height: 38px;
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .tip-content h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .tip-content p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        .form-panel {
+            padding: 36px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .quantity-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .quantity-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--secondary);
+        }
+
+        /* Food & Accessories Quick Suggestion Tags */
+        .quick-suggest-header {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--secondary-light);
+            margin: 10px 0 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .food-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .food-type-badge {
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-pill);
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .food-type-badge:hover,
+        .food-type-badge.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .food-type-badge.others-badge:hover,
+        .food-type-badge.others-badge.active {
+            background: #ec4899;
+            color: white;
+            border-color: #f472b6;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+        }
+
+        .qty-presets-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .qty-preset-chip {
+            padding: 4px 11px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-pill);
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .qty-preset-chip:hover,
+        .qty-preset-chip.active {
+            background: var(--secondary);
+            color: #120e0a;
+            border-color: var(--secondary);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Community Request Card Ribbons */
+        .card-req-ribbon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 5px 14px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .ribbon-food-req {
+            background: linear-gradient(90deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .ribbon-others-req {
+            background: linear-gradient(90deg, #ec4899, #be185d);
+            color: white;
+            box-shadow: 0 2px 10px rgba(236, 72, 153, 0.3);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: 1.15rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.45);
+        }
+
+        .submit-btn.btn-others {
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.3);
+        }
+
+        .submit-btn.btn-others:hover {
+            box-shadow: 0 15px 35px rgba(236, 72, 153, 0.45);
+        }
+
+        /* Feed Section Styles */
+        .feed-section {
+            margin-top: 48px;
+        }
+
+        .feed-filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .feed-chip {
+            padding: 9px 20px;
+            border-radius: var(--radius-pill);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feed-chip:hover, .feed-chip.active {
+            background: var(--secondary);
+            color: #120e0a;
+            border-color: var(--secondary);
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .requests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .request-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 38px 24px 24px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .request-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+        }
+
+        .request-card.card-food-req {
+            border-color: rgba(16, 185, 129, 0.3);
+            background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), rgba(255, 255, 255, 0.02));
+        }
+
+        .request-card.card-others-req {
+            border-color: rgba(236, 72, 153, 0.3);
+            background: radial-gradient(circle at top right, rgba(236, 72, 153, 0.08), rgba(255, 255, 255, 0.02));
+        }
+
+        .donate-btn-small {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            padding: 10px 18px;
+            border-radius: var(--radius-pill);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+
+        .donate-btn-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .donate-btn-small.btn-donate-others {
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+        }
+
+        .donate-btn-small.btn-donate-others:hover {
+            box-shadow: 0 6px 16px rgba(236, 72, 153, 0.4);
+        }
+
+        .req-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .req-time {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .req-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .req-details {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.5;
+        }
+
+        .req-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: var(--secondary-light);
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .req-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        @media (max-width: 800px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script th:src="@{/js/global.js}"></script>
+    <div class="container fade-in">
+        <!-- Header -->
+        <div class="header glass-panel">
+            <a th:href="@{/dashboard}" class="back-btn" title="Back to Dashboard"><i class="fas fa-arrow-left"></i></a>
+            <div class="header-content">
+                <h1 id="headerTitle" data-en="Post a Community Request" data-bn="সহায়তার আবেদন পোস্ট করুন">Post a Community Request</h1>
+                <p id="headerSubtitle" data-en="Select an assistance cart below to request meals or essential non-food accessories." data-bn="খাবার অথবা নিত্যপ্রয়োজনীয় সামগ্রী পেতে নিচের যেকোনো একটি কার্ট নির্বাচন করে আবেদন করুন।">
+                    Select an assistance cart below to request meals or essential non-food accessories.
+                </p>
+            </div>
+            <div class="header-right-actions" style="display: flex; align-items: center; gap: 12px;"></div>
+        </div>
+
+        <!-- 2 Distinct Hero Request Carts (Alada Carts) -->
+        <div class="cart-selector-grid">
+            <!-- 1. FOOD REQUEST CART (ONLY FOOD) -->
+            <div class="cart-switch-card food-request-cart glass-panel"
+                th:classappend="${initialType == 'FOOD' || initialType == null ? ' active' : ''}"
+                id="foodReqCartHero" onclick="switchRequestMode('FOOD')">
+                <div class="cart-card-ribbon ribbon-food">
+                    <i class="fas fa-utensils"></i> <span data-en="ONLY FOOD REQUEST CART" data-bn="শুধুমাত্র খাদ্য আবেদন কার্ট">ONLY FOOD REQUEST CART</span>
+                </div>
+                <div class="cs-top">
+                    <div class="cs-icon food-icon"><i class="fas fa-utensils"></i></div>
+                    <div class="cs-badge food-pill" data-en="ONLY FOOD" data-bn="শুধুমাত্র খাবার">ONLY FOOD</div>
+                </div>
+                <h3 class="cs-title" data-en="Food Request Cart" data-bn="খাবার সহায়তার কার্ট">Food Request Cart</h3>
+                <p class="cs-desc" data-en="Request surplus hot meals, grocery packs, Ramadan Iftar/Sehri, or fresh Qurbani meat for your family or shelter." data-bn="রান্না করা তাজা খাবার, শুকনো রেশন, মাহে রমজানের ইফতার ও সেহরি অথবা কোরবানির গোশতের সহায়তা আবেদন করুন।">
+                    Request surplus hot meals, grocery packs, Ramadan Iftar/Sehri, or fresh Qurbani meat for your family or shelter.
+                </p>
+                <div class="cs-footer">
+                    <div class="cs-indicator">
+                        <span class="cs-dot"></span>
+                        <span data-en="Strictly Food Items Only" data-bn="শুধুমাত্র খাদ্য সামগ্রী">Strictly Food Items Only</span>
+                    </div>
+                    <span class="cs-btn-text" id="foodCartSelectText"
+                        th:attr="data-en=${initialType != 'OTHER_ACCESSORIES' && initialType != 'OTHERS' ? 'Active Cart' : 'Select Cart'}, data-bn=${initialType != 'OTHER_ACCESSORIES' && initialType != 'OTHERS' ? 'সক্রিয় কার্ট' : 'কার্ট নির্বাচন'}"
+                        th:text="${initialType != 'OTHER_ACCESSORIES' && initialType != 'OTHERS' ? 'Active Cart' : 'Select Cart'}">Active Cart</span>
+                </div>
+            </div>
+
+            <!-- 2. OTHER ACCESSORIES REQUEST CART (WITHOUT FOOD) -->
+            <div class="cart-switch-card other-request-cart glass-panel"
+                th:classappend="${initialType == 'OTHER_ACCESSORIES' || initialType == 'OTHERS' ? ' active' : ''}"
+                id="othersReqCartHero" onclick="switchRequestMode('OTHER_ACCESSORIES')">
+                <div class="cart-card-ribbon ribbon-others">
+                    <i class="fas fa-boxes"></i> <span data-en="WITHOUT FOOD &bull; ACCESSORIES CART" data-bn="খাবার ছাড়া &bull; সামগ্রী কার্ট">WITHOUT FOOD &bull; ACCESSORIES CART</span>
+                </div>
+                <div class="cs-top">
+                    <div class="cs-icon other-icon"><i class="fas fa-box-open"></i></div>
+                    <div class="cs-badge other-pill" data-en="WITHOUT FOOD" data-bn="খাবার ছাড়া">WITHOUT FOOD</div>
+                </div>
+                <h3 class="cs-title" data-en="Other Accessories Cart" data-bn="অন্যান্য সামগ্রীর কার্ট">Other Accessories Cart</h3>
+                <p class="cs-desc" data-en="Need winter blankets, jackets, clean clothing, footwear, school bags, or essential supplies? Post your non-food request." data-bn="শীতের কম্বল, পরিধেয় পোশাক, জুতো, স্কুল ব্যাগ অথবা নিত্যপ্রয়োজনীয় সামগ্রীর দরকার? খাদ্য-বহির্ভূত আবেদন করুন।">
+                    Need winter blankets, jackets, clean clothing, footwear, school bags, or essential supplies? Post your non-food request.
+                </p>
+                <div class="cs-footer">
+                    <div class="cs-indicator">
+                        <span class="cs-dot"></span>
+                        <span data-en="Zero Food &bull; Accessories Only" data-bn="খাদ্যমুক্ত &bull; শুধুমাত্র সামগ্রী">Zero Food &bull; Accessories Only</span>
+                    </div>
+                    <span class="cs-btn-text" id="othersCartSelectText"
+                        th:attr="data-en=${initialType == 'OTHER_ACCESSORIES' || initialType == 'OTHERS' ? 'Active Cart' : 'Select Cart'}, data-bn=${initialType == 'OTHER_ACCESSORIES' || initialType == 'OTHERS' ? 'সক্রিয় কার্ট' : 'কার্ট নির্বাচন'}"
+                        th:text="${initialType == 'OTHER_ACCESSORIES' || initialType == 'OTHERS' ? 'Active Cart' : 'Select Cart'}">Select Cart</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <div class="info-panel glass-panel">
+                <h2 class="section-title" id="tipsTitle" data-en="Request Guidelines" data-bn="অনুরোধ করার নিয়মাবলী">Request Guidelines</h2>
+                <ul class="tips-list">
+                    <li>
+                        <div class="tip-icon"><i class="fas fa-bullhorn"></i></div>
+                        <div class="tip-content">
+                            <h4 id="tip1Title" data-en="Be Specific" data-bn="সুনির্দিষ্ট বিবরণ দিন">Be Specific</h4>
+                            <p id="tip1Desc" data-en="Clearly state what items you need (e.g., Rice, Khichuri, or Winter Blankets, Clothes)." data-bn="আপনার ঠিক কী প্রয়োজন তা স্পষ্টভাবে উল্লেখ করুন (যেমন: চাল, খিচুড়ি, শীতবস্ত্র ইত্যাদি)।">
+                                Clearly state what items you need (e.g., Rice, Khichuri, or Winter Blankets, Clothes).
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="tip-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="tip-content">
+                            <h4 data-en="Accurate Location" data-bn="সঠিক এলাকা ও ঠিকানা">Accurate Location</h4>
+                            <p data-en="Provide a precise location to help donors reach you easily." data-bn="দাতারা যাতে সহজে পৌঁছাতে পারে সেজন্য সুস্পষ্ট ঠিকানা দিন।">
+                                Provide a precise location to help donors reach you easily.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="tip-icon"><i class="fas fa-users"></i></div>
+                        <div class="tip-content">
+                            <h4 data-en="Reasonable Quantity" data-bn="প্রয়োজনীয় পরিমাণ">Reasonable Quantity</h4>
+                            <p data-en="Request only what is needed for you, your family, or your shelter community." data-bn="আপনার বা আপনার আশ্রিতদের জন্য ঠিক যতটুকু প্রয়োজন ততটুকুই চান।">
+                                Request only what is needed for you, your family, or your shelter community.
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="form-panel glass-panel">
+                <form th:action="@{/food/request}" method="post">
+                    <!-- Category hidden field -->
+                    <input type="hidden" name="category" id="requestCategoryInput" th:value="${initialType == 'OTHER_ACCESSORIES' || initialType == 'OTHERS' ? 'OTHER_ACCESSORIES' : 'FOOD'}">
+
+                    <div class="form-group">
+                        <label class="form-label" id="itemNameLabel">
+                            <i class="fas fa-tag" style="color: var(--secondary);"></i> 
+                            <span id="itemNameLabelText" data-en="What food do you need?" data-bn="আপনার কী খাবার প্রয়োজন?">What food do you need?</span>
+                        </label>
+                        <input type="text" name="foodName" id="foodNameInput" class="form-control"
+                            placeholder="e.g., Rice and Lentils, Baby Food, Iftar Pack"
+                            data-placeholder-en="e.g., Rice and Lentils, Baby Food, Iftar Pack"
+                            data-placeholder-bn="যেমন: ভাত ও ডাল, খিচুড়ি, শিশু খাদ্য, ইফতার প্যাকেট..." required>
+                        <div class="quick-suggest-header">
+                            <i class="fas fa-magic" style="color: var(--secondary-light);"></i>
+                            <span data-en="Tap any item below to autofill request:" data-bn="স্বয়ংক্রিয় পূরণের জন্য যেকোনো আইটেমে ট্যাপ করুন:">Tap any item below to autofill request:</span>
+                        </div>
+                        <div class="food-types" id="reqQuickTags">
+                            <!-- Populated dynamically based on selected cart -->
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" id="qtyLabel">
+                                <i class="fas fa-users" style="color: var(--secondary);"></i> 
+                                <span id="qtyLabelText" data-en="Quantity (Servings / Meals)" data-bn="পরিমাণ (প্লেট / প্যাকেট)">Quantity (Servings / Meals)</span>
+                            </label>
+                            <div class="quantity-container">
+                                <button type="button" class="quantity-btn" id="decrease-qty"><i
+                                        class="fas fa-minus"></i></button>
+                                <input type="number" name="quantity" id="quantity" class="form-control"
+                                    style="text-align: center;" value="1" min="1" max="500" required>
+                                <button type="button" class="quantity-btn" id="increase-qty"><i
+                                        class="fas fa-plus"></i></button>
+                            </div>
+                            <div class="qty-presets-row" id="reqQtyPresets">
+                                <button type="button" class="qty-preset-chip" data-qty="1">1</button>
+                                <button type="button" class="qty-preset-chip" data-qty="2">2</button>
+                                <button type="button" class="qty-preset-chip" data-qty="5">5</button>
+                                <button type="button" class="qty-preset-chip" data-qty="10">10</button>
+                                <button type="button" class="qty-preset-chip" data-qty="20">20</button>
+                                <button type="button" class="qty-preset-chip" data-qty="50">50</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt" style="color: #ef4444;"></i> 
+                                <span data-en="Location / Area" data-bn="এলাকা / ঠিকানা">Location / Area</span>
+                            </label>
+                            <input type="text" name="location" class="form-control"
+                                placeholder="e.g., Dhanmondi 27, Dhaka"
+                                data-placeholder-en="e.g., Dhanmondi 27, Dhaka"
+                                data-placeholder-bn="যেমন: ধানমন্ডি ২৭, ঢাকা" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-align-left" style="color: var(--secondary);"></i> 
+                            <span data-en="Additional Details" data-bn="অতিরিক্ত বিবরণ">Additional Details</span>
+                        </label>
+                        <textarea name="description" id="reqDescription" class="form-control" rows="3"
+                            placeholder="Describe any dietary needs, urgency, or specific clothing sizes..."
+                            data-placeholder-en="Describe any dietary needs, urgency, or specific clothing sizes..."
+                            data-placeholder-bn="জরুরী প্রয়োজন, খাদ্য সংক্রান্ত বিশেষ নির্দেশনা বা পোশাকের সাইজ উল্লেখ করুন..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        <span id="submitBtnText" data-en="Submit Food Request" data-bn="খাবারের অনুরোধ জমা দিন">Submit Food Request</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Community Requests Live Feed -->
+        <div class="feed-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                <h2 class="section-title" style="margin-bottom: 0;" data-en="Community Requests Live Feed" data-bn="কমিউনিটির সক্রিয় অনুরোধসমূহ">Community Requests Live Feed</h2>
+                <span class="badge"
+                    style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 5px 14px; border-radius: var(--radius-pill); font-size: 0.8rem; font-weight: 700;"
+                    data-en="Live Assistance Feed" data-bn="লাইভ সহায়তা ফিড">Live Assistance Feed</span>
+            </div>
+
+            <!-- Feed Filter Pills -->
+            <div class="feed-filter-bar">
+                <button type="button" class="feed-chip active" data-filter="ALL">
+                    <i class="fas fa-th-large"></i> <span data-en="All Community Requests" data-bn="সকল অনুরোধ">All Community Requests</span>
+                </button>
+                <button type="button" class="feed-chip" data-filter="FOOD">
+                    <i class="fas fa-utensils"></i> <span data-en="Food Requests Only" data-bn="শুধুমাত্র খাবারের অনুরোধ">Food Requests Only</span>
+                </button>
+                <button type="button" class="feed-chip" data-filter="OTHER_ACCESSORIES">
+                    <i class="fas fa-box-open"></i> <span data-en="Other Accessories Only" data-bn="শুধুমাত্র সামগ্রীর অনুরোধ">Other Accessories Only</span>
+                </button>
+            </div>
+
+            <div class="requests-grid" id="requestsGrid">
+                <div th:each="req : ${requests}" class="request-card"
+                    th:classappend="${req.category != null && (req.category.contains('OTHER') || req.category.contains('ACCESSOR') || req.category.contains('BLANKET') || req.category.contains('DRESS') || req.category.contains('CLOTHES'))} ? ' card-others-req' : ' card-food-req'"
+                    th:attr="data-req-cat=${req.category != null ? req.category.toUpperCase() : 'FOOD'}">
+                    
+                    <!-- Distinct Cart Ribbon -->
+                    <div th:if="${req.category != null && (req.category.contains('OTHER') || req.category.contains('ACCESSOR') || req.category.contains('BLANKET') || req.category.contains('DRESS') || req.category.contains('CLOTHES'))}"
+                         class="card-req-ribbon ribbon-others-req">
+                        <i class="fas fa-box-open"></i> <span data-en="OTHER ACCESSORIES REQUEST CART" data-bn="অন্যান্য সামগ্রী আবেদন কার্ট">OTHER ACCESSORIES REQUEST CART</span>
+                    </div>
+                    <div th:if="${req.category == null || (!req.category.contains('OTHER') && !req.category.contains('ACCESSOR') && !req.category.contains('BLANKET') && !req.category.contains('DRESS') && !req.category.contains('CLOTHES'))}"
+                         class="card-req-ribbon ribbon-food-req">
+                        <i class="fas fa-utensils"></i> <span data-en="ONLY FOOD REQUEST CART" data-bn="শুধুমাত্র খাদ্য আবেদন কার্ট">ONLY FOOD REQUEST CART</span>
+                    </div>
+
+                    <div>
+                        <div class="req-header">
+                            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                                <span class="badge"
+                                    style="background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;"
+                                    th:text="${req.status}">Pending</span>
+                                <span th:if="${req.category != null && (req.category.contains('OTHER') || req.category.contains('ACCESSOR') || req.category.contains('BLANKET') || req.category.contains('DRESS') || req.category.contains('CLOTHES'))}"
+                                    class="badge"
+                                    style="background: rgba(236, 72, 153, 0.25); color: #fbcfe8; border: 1px solid rgba(236, 72, 153, 0.4); padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">
+                                    <i class="fas fa-box-open"></i> Other Accessories
+                                </span>
+                                <span th:if="${req.category == null || (!req.category.contains('OTHER') && !req.category.contains('ACCESSOR') && !req.category.contains('BLANKET') && !req.category.contains('DRESS') && !req.category.contains('CLOTHES'))}"
+                                    class="badge"
+                                    style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">
+                                    <i class="fas fa-utensils"></i> Food Request
+                                </span>
+                            </div>
+                            <span class="req-time" th:text="${#temporals.format(req.requestTime, 'dd MMM, hh:mm a')}">10 min ago</span>
+                        </div>
+                        <h3 class="req-title" th:text="${req.foodName}">Need Rice</h3>
+                        <p class="req-details" th:text="${req.description}">Description...</p>
+
+                        <div class="req-meta">
+                            <span><i class="fas fa-cubes"></i> <span th:text="${req.quantity}">10</span> <span th:text="${req.category != null && (req.category.contains('OTHER') || req.category.contains('ACCESSOR') || req.category.contains('BLANKET') || req.category.contains('DRESS') || req.category.contains('CLOTHES')) ? 'Units / Pcs' : 'Servings / Meals'}">Servings</span></span>
+                            <span><i class="fas fa-map-marker-alt" style="color: #ef4444;"></i> <span th:text="${req.location}">Dhaka</span></span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--glass-border);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 26px; height: 26px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;" th:text="${req.requesterName}">User</span>
+                            </div>
+                            <a th:href="'tel:' + ${req.requesterPhone}"
+                                style="color: var(--secondary-light); text-decoration: none; font-size: 0.85rem; font-weight: 700;"><i
+                                    class="fas fa-phone"></i> Contact</a>
+                        </div>
+
+                        <!-- Donate Button (only shown for Pending requests) -->
+                        <button th:if="${req.status == 'Pending'}" th:data-request-id="${req.id}"
+                            class="donate-btn-small donate-request-btn"
+                            th:classappend="${req.category != null && (req.category.contains('OTHER') || req.category.contains('ACCESSOR') || req.category.contains('BLANKET') || req.category.contains('DRESS') || req.category.contains('CLOTHES'))} ? ' btn-donate-others' : ''"
+                            style="width: 100%; justify-content: center; border: none; cursor: pointer;">
+                            <i th:class="${req.category != null && (req.category.contains('OTHER') || req.category.contains('ACCESSOR') || req.category.contains('BLANKET') || req.category.contains('DRESS') || req.category.contains('CLOTHES'))} ? 'fas fa-box-open' : 'fas fa-hand-holding-heart'"></i> 
+                            <span th:text="${req.category != null && (req.category.contains('OTHER') || req.category.contains('ACCESSOR') || req.category.contains('BLANKET') || req.category.contains('DRESS') || req.category.contains('CLOTHES')) ? 'Donate Item to Request' : 'Donate Food to Request'}">Donate to This Request</span>
+                        </button>
+                        <div th:if="${req.status == 'Processing'}"
+                            style="text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px dashed var(--glass-border); font-weight: 600;">
+                            <i class="fas fa-check-circle" style="color: var(--primary);"></i>
+                            Donor committed! Handover in progress.
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${requests.empty}"
+                    style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">
+                    <i class="fas fa-inbox" style="font-size: 2.2rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                    <p data-en="No active requests at the moment." data-bn="এই মুহূর্তে কোনো সক্রিয় অনুরোধ পাওয়া যায়নি।">No active requests at the moment.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // Stepper
+            const qty = document.getElementById('quantity');
+            document.getElementById('decrease-qty').addEventListener('click', () => { if (qty.value > 1) qty.value--; });
+            document.getElementById('increase-qty').addEventListener('click', () => { if (qty.value < 500) qty.value++; });
+
+            // Quantity presets
+            document.querySelectorAll('#reqQtyPresets .qty-preset-chip').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    document.querySelectorAll('#reqQtyPresets .qty-preset-chip').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    if (qty) qty.value = this.getAttribute('data-qty');
+                });
+            });
+
+            // Quick Request Tags Data
+            const reqTagsData = {
+                'FOOD': [
+                    { name: 'Hot Rice & Chicken Curry (ভাত ও মুরগির মাংস)', icon: 'fas fa-bowl-rice', cls: '' },
+                    { name: 'Bhuna Khichuri & Egg (ভুনা খিচুড়ি ও ডিম)', icon: 'fas fa-bowl-food', cls: '' },
+                    { name: 'Ramadan Iftar Box (ইফতার সামগ্রী প্যাকেট)', icon: 'fas fa-moon', cls: '' },
+                    { name: 'Milk & Baby Nutrition (দুধ ও শিশু খাদ্য)', icon: 'fas fa-baby', cls: '' },
+                    { name: 'Emergency Family Ration (জরুরী পারিবারিক রেশন)', icon: 'fas fa-box', cls: '' },
+                    { name: 'Fresh Qurbani Meat (কোরবানির গোশত)', icon: 'fas fa-drumstick-bite', cls: '' }
+                ],
+                'OTHER_ACCESSORIES': [
+                    { name: 'Thick Warm Blanket (ভারী শীতের কম্বল)', icon: 'fas fa-snowflake', cls: 'others-badge' },
+                    { name: 'Warm Jacket / Sweater (সোয়েটার ও জ্যাকেট)', icon: 'fas fa-tshirt', cls: 'others-badge' },
+                    { name: 'Children Clothes (শিশুদের পোশাক)', icon: 'fas fa-child', cls: 'others-badge' },
+                    { name: 'Warm Woolen Shawl (উলের চাদর)', icon: 'fas fa-scroll', cls: 'others-badge' },
+                    { name: 'Saree & Lungi (শাড়ি ও লুঙ্গি)', icon: 'fas fa-vest', cls: 'others-badge' },
+                    { name: 'Shoes & Footwear (জুতো ও স্যান্ডেল)', icon: 'fas fa-shoe-prints', cls: 'others-badge' },
+                    { name: 'School Bag & Stationery (স্কুল ব্যাগ ও বইখাতা)', icon: 'fas fa-backpack', cls: 'others-badge' }
+                ]
+            };
+
+            function renderReqTags(mode) {
+                const container = document.getElementById('reqQuickTags');
+                if (!container) return;
+                const isOther = mode === 'OTHER_ACCESSORIES' || mode === 'OTHERS';
+                const list = isOther ? reqTagsData['OTHER_ACCESSORIES'] : reqTagsData['FOOD'];
+                container.innerHTML = '';
+                list.forEach(item => {
+                    const badge = document.createElement('span');
+                    badge.className = 'food-type-badge ' + (item.cls || '');
+                    badge.innerHTML = `<i class="${item.icon}"></i> ${item.name}`;
+                    badge.addEventListener('click', function () {
+                        document.querySelectorAll('#reqQuickTags .food-type-badge').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        foodNameInput.value = item.name;
+                    });
+                    container.appendChild(badge);
+                });
+            }
+
+            // Dynamic Form Mode Switching (Food vs Other Accessories)
+            const catInput = document.getElementById('requestCategoryInput');
+            const itemNameLabelText = document.getElementById('itemNameLabelText');
+            const foodNameInput = document.getElementById('foodNameInput');
+            const qtyLabelText = document.getElementById('qtyLabelText');
+            const submitBtn = document.getElementById('submitBtn');
+            const submitBtnText = document.getElementById('submitBtnText');
+            const tip1Desc = document.getElementById('tip1Desc');
+            const foodCardHero = document.getElementById('foodReqCartHero');
+            const othersCardHero = document.getElementById('othersReqCartHero');
+            const foodCartSelectText = document.getElementById('foodCartSelectText');
+            const othersCartSelectText = document.getElementById('othersCartSelectText');
+
+            window.switchRequestMode = function (mode) {
+                const isBn = (localStorage.getItem('mukti_lang') || 'en') === 'bn';
+                catInput.value = mode;
+
+                if (mode === 'OTHER_ACCESSORIES' || mode === 'OTHERS') {
+                    if (foodCardHero) foodCardHero.classList.remove('active');
+                    if (othersCardHero) othersCardHero.classList.add('active');
+
+                    if (foodCartSelectText) {
+                        foodCartSelectText.textContent = isBn ? 'কার্ট নির্বাচন' : 'Select Cart';
+                    }
+                    if (othersCartSelectText) {
+                        othersCartSelectText.textContent = isBn ? 'সক্রিয় কার্ট' : 'Active Cart';
+                    }
+
+                    if (itemNameLabelText) {
+                        itemNameLabelText.setAttribute('data-en', 'What accessories or essentials do you need?');
+                        itemNameLabelText.setAttribute('data-bn', 'আপনার কী সামগ্রী বা প্রয়োজনীয় জিনিস দরকার?');
+                        itemNameLabelText.innerText = isBn ? 'আপনার কী সামগ্রী বা প্রয়োজনীয় জিনিস দরকার?' : 'What accessories or essentials do you need?';
+                    }
+                    if (foodNameInput) {
+                        foodNameInput.placeholder = isBn 
+                            ? 'যেমন: শীতের কম্বল, জ্যাকেট, শিশুদের পোশাক, জুতো, স্কুল ব্যাগ...'
+                            : 'e.g., Winter Blanket, Warm Jacket, Children Clothes, Shoes, School Bag...';
+                    }
+                    if (qtyLabelText) {
+                        qtyLabelText.setAttribute('data-en', 'Quantity (Units / Pieces)');
+                        qtyLabelText.setAttribute('data-bn', 'পরিমাণ (পিস / সংখ্যা)');
+                        qtyLabelText.innerText = isBn ? 'পরিমাণ (পিস / সংখ্যা)' : 'Quantity (Units / Pieces)';
+                    }
+                    if (submitBtn) {
+                        submitBtn.classList.add('btn-others');
+                    }
+                    if (submitBtnText) {
+                        submitBtnText.setAttribute('data-en', 'Submit Accessories Request');
+                        submitBtnText.setAttribute('data-bn', 'সামগ্রীর অনুরোধ জমা দিন');
+                        submitBtnText.innerText = isBn ? 'সামগ্রীর অনুরোধ জমা দিন' : 'Submit Accessories Request';
+                    }
+                    if (tip1Desc) {
+                        tip1Desc.setAttribute('data-en', 'Clearly state what clothes, blankets, or accessories you need and sizes.');
+                        tip1Desc.setAttribute('data-bn', 'কী ধরনের পোশাক, কম্বল বা সামগ্রী প্রয়োজন তা স্পষ্ট করুন।');
+                        tip1Desc.innerText = isBn ? 'কী ধরনের পোশাক, কম্বল বা সামগ্রী প্রয়োজন তা স্পষ্ট করুন।' : 'Clearly state what clothes, blankets, or accessories you need and sizes.';
+                    }
+
+                    // Auto sync feed to Other Accessories
+                    filterFeed('OTHER_ACCESSORIES');
+                } else {
+                    if (othersCardHero) othersCardHero.classList.remove('active');
+                    if (foodCardHero) foodCardHero.classList.add('active');
+
+                    if (othersCartSelectText) {
+                        othersCartSelectText.textContent = isBn ? 'কার্ট নির্বাচন' : 'Select Cart';
+                    }
+                    if (foodCartSelectText) {
+                        foodCartSelectText.textContent = isBn ? 'সক্রিয় কার্ট' : 'Active Cart';
+                    }
+
+                    if (itemNameLabelText) {
+                        itemNameLabelText.setAttribute('data-en', 'What food do you need?');
+                        itemNameLabelText.setAttribute('data-bn', 'আপনার কী খাবার প্রয়োজন?');
+                        itemNameLabelText.innerText = isBn ? 'আপনার কী খাবার প্রয়োজন?' : 'What food do you need?';
+                    }
+                    if (foodNameInput) {
+                        foodNameInput.placeholder = isBn 
+                            ? 'যেমন: ভাত ও ডাল, খিচুড়ি, শিশু খাদ্য, ইফতার প্যাকেট...'
+                            : 'e.g., Rice and Lentils, Baby Food, Iftar Pack';
+                    }
+                    if (qtyLabelText) {
+                        qtyLabelText.setAttribute('data-en', 'Quantity (Servings / Meals)');
+                        qtyLabelText.setAttribute('data-bn', 'পরিমাণ (প্লেট / প্যাকেট)');
+                        qtyLabelText.innerText = isBn ? 'পরিমাণ (প্লেট / প্যাকেট)' : 'Quantity (Servings / Meals)';
+                    }
+                    if (submitBtn) {
+                        submitBtn.classList.remove('btn-others');
+                    }
+                    if (submitBtnText) {
+                        submitBtnText.setAttribute('data-en', 'Submit Food Request');
+                        submitBtnText.setAttribute('data-bn', 'খাবারের অনুরোধ জমা দিন');
+                        submitBtnText.innerText = isBn ? 'খাবারের অনুরোধ জমা দিন' : 'Submit Food Request';
+                    }
+                    if (tip1Desc) {
+                        tip1Desc.setAttribute('data-en', 'Clearly mention what kind of food you need (e.g., Rice, Dry Food, Baby Food).');
+                        tip1Desc.setAttribute('data-bn', 'আপনার ঠিক কী ধরনের খাবার প্রয়োজন তা স্পষ্টভাবে উল্লেখ করুন (যেমন: চাল, ডাল, শিশু খাদ্য)।');
+                        tip1Desc.innerText = isBn ? 'আপনার ঠিক কী ধরনের খাবার প্রয়োজন তা স্পষ্টভাবে উল্লেখ করুন (যেমন: চাল, ডাল, শিশু খাদ্য)।' : 'Clearly mention what kind of food you need (e.g., Rice, Dry Food, Baby Food).';
+                    }
+
+                    // Auto sync feed to Food
+                    filterFeed('FOOD');
+                }
+
+                // Render dynamic quick tags for request
+                renderReqTags(mode);
+            };
+
+            function filterFeed(filter) {
+                document.querySelectorAll('.feed-chip').forEach(c => {
+                    if (c.getAttribute('data-filter') === filter) {
+                        c.classList.add('active');
+                    } else {
+                        c.classList.remove('active');
+                    }
+                });
+
+                const cards = document.querySelectorAll('#requestsGrid .request-card');
+                cards.forEach(card => {
+                    const cat = (card.getAttribute('data-req-cat') || 'FOOD').toUpperCase();
+                    const isOther = cat.includes('OTHER') || cat.includes('ACCESSOR') || cat.includes('BLANKET') || cat.includes('DRESS') || cat.includes('CLOTHES');
+
+                    if (filter === 'ALL') {
+                        card.style.display = 'flex';
+                    } else if (filter === 'FOOD') {
+                        card.style.display = !isOther ? 'flex' : 'none';
+                    } else if (filter === 'OTHER_ACCESSORIES') {
+                        card.style.display = isOther ? 'flex' : 'none';
+                    }
+                });
+            }
+
+            // Initialize mode on page load
+            const initMode = catInput ? catInput.value : 'FOOD';
+            window.switchRequestMode(initMode);
+
+            // Community Feed Filter Logic
+            document.querySelectorAll('.feed-chip').forEach(chip => {
+                chip.addEventListener('click', function () {
+                    const filter = this.getAttribute('data-filter');
+                    filterFeed(filter);
+                });
+            });
+
+            // Handle "Donate to This Request" buttons
+            document.querySelectorAll('.donate-request-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const requestId = this.getAttribute('data-request-id');
+                    const isBn = (localStorage.getItem('mukti_lang') || 'en') === 'bn';
+                    const confirmMsg = isBn 
+                        ? 'আপনি কি এই অনুরোধটিতে অনুদান দিতে চান? অনুরোধটি আপনার সাথে যুক্ত করা হবে।'
+                        : 'Are you sure you want to donate to this request? The request will be assigned to you.';
+
+                    if (confirm(confirmMsg)) {
+                        this.disabled = true;
+                        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (isBn ? 'প্রক্রিয়াধীন...' : 'Processing...');
+
+                        fetch(`/food/respond-to-request/${requestId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(response => response.text())
+                            .then(data => {
+                                if (data === 'Success') {
+                                    alert(isBn ? '✅ আপনি সফলভাবে এই অনুরোধে সহায়তার প্রতিশ্রুতি দিয়েছেন! হিস্ট্রি পেজ দেখুন।' : '✅ You have successfully committed to this request! Check your history page.');
+                                    location.reload();
+                                } else {
+                                    alert('❌ ' + data);
+                                    this.disabled = false;
+                                    this.innerHTML = '<i class="fas fa-hand-holding-heart"></i> ' + (isBn ? 'এই অনুরোধে দান করুন' : 'Donate to This Request');
+                                }
+                            })
+                            .catch(error => {
+                                alert('Error: ' + error);
+                                this.disabled = false;
+                                this.innerHTML = '<i class="fas fa-hand-holding-heart"></i> ' + (isBn ? 'এই অনুরোধে দান করুন' : 'Donate to This Request');
+                            });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

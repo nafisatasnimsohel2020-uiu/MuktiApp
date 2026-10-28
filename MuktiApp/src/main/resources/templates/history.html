@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity History | MUKTI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="user-phone" th:content="${session.user != null ? session.user.phone : ''}">
+    <link th:href="@{/css/global.css}" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-light: #34D399;
+            --primary-dark: #059669;
+            --secondary: #F59E0B;
+            --secondary-light: #FCD34D;
+            --purple: #8B5CF6;
+            --purple-light: #C4B5FD;
+            --dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(20px);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.65);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-pill: 50px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', 'Inter', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #24160e, #120e0a);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 30px 16px;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* Top Nav Header */
+        .header-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 22px 28px;
+        }
+
+        .header-titles h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-titles p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-pill);
+            transition: all 0.25s ease;
+            font-size: 0.9rem;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            transform: translateX(-3px);
+        }
+
+        /* Summary Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 26px;
+        }
+
+        .stat-card {
+            padding: 18px 20px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: transform 0.25s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .stat-val {
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: white;
+        }
+
+        .stat-lbl {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Tabs */
+        .filter-section {
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tabs-bar {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            border-radius: var(--radius-pill);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 10px 18px;
+            border-radius: var(--radius-pill);
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.25));
+            border-color: var(--primary);
+            color: var(--primary-light);
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+        }
+
+        /* Category Sub-Filters */
+        .type-filters {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            padding-left: 6px;
+        }
+
+        .type-filter-btn {
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .type-filter-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .type-filter-btn.active {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: var(--secondary);
+            color: var(--secondary-light);
+        }
+
+        /* Activity Cards */
+        .activity-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .activity-card {
+            padding: 22px 24px;
+            border-radius: var(--radius-lg);
+            transition: all 0.25s ease;
+            border: 1px solid var(--glass-border);
+        }
+
+        .activity-card:hover {
+            border-color: rgba(255, 255, 255, 0.16);
+            transform: translateY(-2px);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .card-title-wrap h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .card-date {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-badges {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-role-donor {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .badge-role-receiver {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .badge-role-request {
+            background: rgba(236, 72, 153, 0.2);
+            color: #f472b6;
+            border: 1px solid rgba(236, 72, 153, 0.4);
+        }
+
+        .badge-cat-food {
+            background: rgba(16, 185, 129, 0.12);
+            color: #a7f3d0;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .badge-cat-other {
+            background: rgba(139, 92, 246, 0.15);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .badge-cat-ramadan {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fde68a;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+
+        .badge-cat-qurbani {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+
+        .status-pill {
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .status-available {
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .status-processing {
+            background: rgba(245, 158, 11, 0.18);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.75; }
+        }
+
+        .status-received {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .status-cancelled {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Card Meta Information */
+        .card-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+
+        .meta-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .meta-field i {
+            color: var(--primary-light);
+            font-size: 0.95rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .meta-field .meta-lbl {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .meta-field .meta-val {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .block-mini-btn {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            border-radius: var(--radius-pill);
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .block-mini-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Card Actions */
+        .card-actions-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            flex-wrap: wrap;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-act {
+            padding: 8px 18px;
+            border-radius: var(--radius-pill);
+            font-size: 0.86rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        /* PROMINENT DONATE BUTTON (USER SPECIFIED) */
+        .btn-donate {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+            font-size: 0.92rem;
+            padding: 9px 22px;
+        }
+
+        .btn-donate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-chat {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            color: white;
+        }
+
+        .btn-chat:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .btn-cancel {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        .btn-cancel:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .notice-waiting {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #fbbf24;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        .notice-completed {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: #6ee7b7;
+        }
+
+        .empty-placeholder {
+            text-align: center;
+            padding: 50px 20px;
+            border-radius: var(--radius-lg);
+            border: 1px dashed var(--glass-border);
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .empty-placeholder i {
+            font-size: 2.6rem;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        @media (max-width: 768px) {
+            .header-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+            .card-actions-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .action-buttons {
+                width: 100%;
+            }
+            .btn-act {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script th:src="@{/js/global.js}"></script>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header-nav glass-panel">
+            <div class="header-titles">
+                <h1>
+                    <i class="fas fa-history" style="color: var(--secondary);"></i>
+                    <span data-en="Activity History" data-bn="কার্যক্রমের ইতিহাস">Activity History</span>
+                </h1>
+                <p data-en="View and manage your donations, received items, and community requests." data-bn="আপনার দান, গ্রহণ ও সাহায্যের অনুরোধের বিবরণ দেখুন।">
+                    View and manage your donations, received items, and community requests.
+                </p>
+            </div>
+            <div class="user-actions" style="display: flex; gap: 12px; align-items: center;">
+                <a th:href="@{/dashboard}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span data-en="Back to Dashboard" data-bn="ড্যাশবোর্ডে ফিরুন">Back to Dashboard</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Summary Stats -->
+        <div class="stats-grid">
+            <div class="stat-card glass-panel">
+                <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+                    <i class="fas fa-hand-holding-heart"></i>
+                </div>
+                <div>
+                    <div class="stat-val" th:text="${donations.size()}">0</div>
+                    <div class="stat-lbl" data-en="Donations" data-bn="আমার দান">Donations</div>
+                </div>
+            </div>
+
+            <div class="stat-card glass-panel">
+                <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <div>
+                    <div class="stat-val" th:text="${receives.size()}">0</div>
+                    <div class="stat-lbl" data-en="Received" data-bn="গৃহীত সামগ্রী">Received</div>
+                </div>
+            </div>
+
+            <div class="stat-card glass-panel">
+                <div class="stat-icon" style="background: rgba(236, 72, 153, 0.15); color: #f472b6;">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <div>
+                    <div class="stat-val" th:text="${foodRequests.size()}">0</div>
+                    <div class="stat-lbl" data-en="Requests" data-bn="সাহায্যের আবেদন">Requests</div>
+                </div>
+            </div>
+
+            <div class="stat-card glass-panel">
+                <div class="stat-icon" style="background: rgba(139, 92, 246, 0.15); color: #c4b5fd;">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div>
+                    <div class="stat-val" th:text="${currentUser != null ? currentUser.points : 0}">0</div>
+                    <div class="stat-lbl" data-en="Karma Points" data-bn="অর্জিত পয়েন্ট">Karma Points</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="filter-section">
+            <div class="tabs-bar">
+                <button type="button" class="tab-btn active" data-tab="ALL">
+                    <i class="fas fa-list-ul"></i>
+                    <span data-en="All Activity" data-bn="সব কার্যক্রম">All Activity</span>
+                </button>
+                <button type="button" class="tab-btn" data-tab="DONATION">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span data-en="My Donations" data-bn="আমার দান">My Donations</span>
+                </button>
+                <button type="button" class="tab-btn" data-tab="RECEIVE">
+                    <i class="fas fa-download"></i>
+                    <span data-en="Received Items" data-bn="আমার গ্রহণ">Received Items</span>
+                </button>
+                <button type="button" class="tab-btn" data-tab="REQUEST">
+                    <i class="fas fa-bullhorn"></i>
+                    <span data-en="My Requests" data-bn="সাহায্যের আবেদন">My Requests</span>
+                </button>
+            </div>
+
+            <div class="type-filters">
+                <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;" data-en="Type:" data-bn="ধরন:">Type:</span>
+                <button type="button" class="type-filter-btn active" data-type="ALL" data-en="All Types" data-bn="সকল ধরন">All Types</button>
+                <button type="button" class="type-filter-btn" data-type="FOOD" data-en="🍲 Food Only" data-bn="🍲 শুধু খাবার">🍲 Food Only</button>
+                <button type="button" class="type-filter-btn" data-type="OTHER" data-en="📦 Other Accessories" data-bn="📦 অন্যান্য সামগ্রী">📦 Other Accessories</button>
+            </div>
+        </div>
+
+        <!-- Feed List -->
+        <div class="activity-feed" id="activityFeed">
+
+            <!-- 1. DONATIONS -->
+            <div th:each="item : ${donations}" class="activity-card glass-panel"
+                data-item-tab="DONATION"
+                th:data-item-type="${item.category != null && (item.category.contains('BLANKET') || item.category.contains('DRESS') || item.category.contains('CLOTHES') || item.category.contains('OTHER') || item.category.contains('ACCESSOR'))} ? 'OTHER' : 'FOOD'">
+                
+                <div class="card-top">
+                    <div class="card-title-wrap">
+                        <h3 th:text="${item.foodName}">Item Name</h3>
+                        <div class="card-date">
+                            <i class="fas fa-clock"></i>
+                            <span th:text="${#temporals.format(item.activityTime, 'dd MMM yyyy, hh:mm a')}">Date</span>
+                        </div>
+                    </div>
+
+                    <div class="card-badges">
+                        <span class="badge badge-role-donor">
+                            <i class="fas fa-heart"></i> <span data-en="DONOR" data-bn="দাতা">DONOR</span>
+                        </span>
+
+                        <!-- Category Pill -->
+                        <span th:if="${item.category != null && item.category.contains('RAMADAN')}" class="badge badge-cat-ramadan">
+                            <i class="fas fa-moon"></i> Ramadan (+15 pts)
+                        </span>
+                        <span th:if="${item.category != null && item.category.contains('QURBAN')}" class="badge badge-cat-qurbani">
+                            <i class="fas fa-drumstick-bite"></i> Qurbani (+15 pts)
+                        </span>
+                        <span th:if="${item.category != null && (item.category.contains('BLANKET') || item.category.contains('DRESS') || item.category.contains('OTHER') || item.category.contains('ACCESSOR'))}" class="badge badge-cat-other">
+                            <i class="fas fa-box-open"></i> Accessories (+30 pts)
+                        </span>
+                        <span th:if="${item.category == null || (!item.category.contains('RAMADAN') && !item.category.contains('QURBAN') && !item.category.contains('BLANKET') && !item.category.contains('DRESS') && !item.category.contains('OTHER') && !item.category.contains('ACCESSOR'))}" class="badge badge-cat-food">
+                            <i class="fas fa-utensils"></i> Meal (+10 pts)
+                        </span>
+
+                        <!-- Status Pill -->
+                        <span th:class="'status-pill status-' + ${#strings.toLowerCase(item.status)}" th:text="${item.status}">Status</span>
+                    </div>
+                </div>
+
+                <div class="card-meta-grid">
+                    <div class="meta-field">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <div class="meta-lbl" data-en="Location" data-bn="এলাকা">Location</div>
+                            <div class="meta-val" th:text="${item.location}">Dhaka</div>
+                        </div>
+                    </div>
+
+                    <div class="meta-field" th:if="${item.otherPartyName != null}">
+                        <i class="fas fa-user-check"></i>
+                        <div>
+                            <div class="meta-lbl" data-en="Recipient" data-bn="গ্রহীতা">Recipient</div>
+                            <div class="meta-val">
+                                <span th:text="${item.otherPartyName}">Name</span>
+                                <button th:if="${item.otherPartyPhone != null}" type="button" class="block-mini-btn"
+                                    th:data-phone="${item.otherPartyPhone}"
+                                    onclick="quickBlock(this.getAttribute('data-phone'))" title="Block User">
+                                    <i class="fas fa-ban"></i> <span data-en="Block" data-bn="ব্লক">Block</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="meta-field">
+                        <i class="fas fa-award"></i>
+                        <div>
+                            <div class="meta-lbl" data-en="Points" data-bn="পয়েন্ট">Points</div>
+                            <div class="meta-val">
+                                <span th:text="'+' + (${item.pointsEarned != null ? item.pointsEarned : 10}) + ' Pts'">+10 Pts</span>
+                                <span th:if="${item.status == 'Received'}" style="color: #6ee7b7; font-size: 0.78rem;" data-en="(Added)" data-bn="(যুক্ত হয়েছে)">(Added)</span>
+                                <span th:if="${item.status != 'Received'}" style="color: var(--text-muted); font-size: 0.78rem;" data-en="(Upon completion)" data-bn="(সম্পন্ন হলে)">(Upon completion)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="card-actions-bar">
+                    <!-- PROCESSING STATE -->
+                    <div th:if="${item.status == 'Processing'}" class="action-buttons">
+                        <!-- PROMINENT DONATE BUTTON (USER SPECIFIED) -->
+                        <button type="button" class="btn-act btn-donate"
+                            th:data-id="${item.id}"
+                            th:data-name="${item.foodName}"
+                            onclick="confirmDonation(this.getAttribute('data-id'), this.getAttribute('data-name'))">
+                            <i class="fas fa-heart"></i>
+                            <span data-en="Donate / Complete" data-bn="দান সম্পন্ন করুন">Donate / Complete</span>
+                        </button>
+
+                        <!-- Chat -->
+                        <a th:if="${item.foodPostId != null && item.otherPartyPhone != null && (item.isRequestDonation == null || !item.isRequestDonation)}"
+                            th:href="@{/chat/room/{id}(id=${item.foodPostId}, otherPhone=${item.otherPartyPhone})}"
+                            class="btn-act btn-chat">
+                            <i class="fas fa-comments"></i>
+                            <span data-en="Chat" data-bn="চ্যাট">Chat</span>
+                        </a>
+                        <a th:if="${item.foodPostId != null && item.otherPartyPhone != null && item.isRequestDonation != null && item.isRequestDonation}"
+                            th:href="@{/chat/room/{id}(id=${item.foodPostId}, otherPhone=${item.otherPartyPhone}, isRequest=true)}"
+                            class="btn-act btn-chat">
+                            <i class="fas fa-comments"></i>
+                            <span data-en="Chat" data-bn="চ্যাট">Chat</span>
+                        </a>
+
+                        <!-- Cancel -->
+                        <button type="button" class="btn-act btn-cancel"
+                            th:data-id="${item.id}"
+                            onclick="cancelActivity(this.getAttribute('data-id'))">
+                            <i class="fas fa-times"></i>
+                            <span data-en="Cancel" data-bn="বাতিল">Cancel</span>
+                        </button>
+                    </div>
+
+                    <!-- AVAILABLE STATE -->
+                    <div th:if="${item.status == 'Available'}">
+                        <span class="notice-waiting">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span data-en="Waiting for someone to claim" data-bn="গ্রহণের জন্য অপেক্ষমান">Waiting for someone to claim</span>
+                        </span>
+                    </div>
+
+                    <!-- COMPLETED / RECEIVED STATE -->
+                    <div th:if="${item.status == 'Received'}">
+                        <span class="notice-completed">
+                            <i class="fas fa-check-circle"></i>
+                            <span data-en="Donation successfully completed!" data-bn="দান সফলভাবে সম্পন্ন হয়েছে!">Donation successfully completed!</span>
+                        </span>
+                    </div>
+
+                    <!-- CANCELLED STATE -->
+                    <div th:if="${item.status == 'Cancelled'}">
+                        <span style="color: #f87171; font-size: 0.85rem;">
+                            <i class="fas fa-ban"></i>
+                            <span data-en="Activity cancelled" data-bn="কার্যক্রম বাতিল করা হয়েছে">Activity cancelled</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. RECEIVES -->
+            <div th:each="item : ${receives}" class="activity-card glass-panel"
+                data-item-tab="RECEIVE"
+                th:data-item-type="${item.category != null && (item.category.contains('BLANKET') || item.category.contains('DRESS') || item.category.contains('CLOTHES') || item.category.contains('OTHER') || item.category.contains('ACCESSOR'))} ? 'OTHER' : 'FOOD'">
+                
+                <div class="card-top">
+                    <div class="card-title-wrap">
+                        <h3 th:text="${item.foodName}">Food Name</h3>
+                        <div class="card-date">
+                            <i class="fas fa-clock"></i>
+                            <span th:text="${#temporals.format(item.activityTime, 'dd MMM yyyy, hh:mm a')}">Date</span>
+                        </div>
+                    </div>
+
+                    <div class="card-badges">
+                        <span class="badge badge-role-receiver">
+                            <i class="fas fa-download"></i> <span data-en="RECEIVER" data-bn="গ্রহীতা">RECEIVER</span>
+                        </span>
+
+                        <span th:if="${item.category != null && (item.category.contains('BLANKET') || item.category.contains('DRESS') || item.category.contains('OTHER') || item.category.contains('ACCESSOR'))}" class="badge badge-cat-other">
+                            <i class="fas fa-box-open"></i> Accessories
+                        </span>
+                        <span th:if="${item.category == null || (!item.category.contains('BLANKET') && !item.category.contains('DRESS') && !item.category.contains('OTHER') && !item.category.contains('ACCESSOR'))}" class="badge badge-cat-food">
+                            <i class="fas fa-utensils"></i> Food
+                        </span>
+
+                        <span th:class="'status-pill status-' + ${#strings.toLowerCase(item.status)}" th:text="${item.status}">Processing</span>
+                    </div>
+                </div>
+
+                <div class="card-meta-grid">
+                    <div class="meta-field">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <div class="meta-lbl" data-en="Pickup Location" data-bn="পিকআপ এলাকা">Pickup Location</div>
+                            <div class="meta-val" th:text="${item.location}">Dhaka</div>
+                        </div>
+                    </div>
+
+                    <div class="meta-field">
+                        <i class="fas fa-user-heart"></i>
+                        <div>
+                            <div class="meta-lbl" data-en="Donor" data-bn="দাতা">Donor</div>
+                            <div class="meta-val">
+                                <span th:text="${item.otherPartyName != null ? item.otherPartyName : 'Community Donor'}">Donor Name</span>
+                                <button th:if="${item.otherPartyPhone != null}" type="button" class="block-mini-btn"
+                                    th:data-phone="${item.otherPartyPhone}"
+                                    onclick="quickBlock(this.getAttribute('data-phone'))" title="Block User">
+                                    <i class="fas fa-ban"></i> <span data-en="Block" data-bn="ব্লক">Block</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="card-actions-bar">
+                    <!-- PROCESSING STATE (RECEIVER WAITING FOR DONOR) -->
+                    <div th:if="${item.status == 'Processing'}" class="action-buttons" style="width: 100%; justify-content: space-between;">
+                        <span class="notice-waiting">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span data-en="Waiting for donor confirmation" data-bn="দাতার দান নিশ্চিতকরণের অপেক্ষায়">Waiting for donor confirmation</span>
+                        </span>
+
+                        <div style="display: flex; gap: 8px;">
+                            <a th:if="${item.foodPostId != null && item.otherPartyPhone != null && (item.isRequestDonation == null || !item.isRequestDonation)}"
+                                th:href="@{/chat/room/{id}(id=${item.foodPostId}, otherPhone=${item.otherPartyPhone})}"
+                                class="btn-act btn-chat">
+                                <i class="fas fa-comments"></i>
+                                <span data-en="Chat with Donor" data-bn="দাতার সাথে চ্যাট">Chat with Donor</span>
+                            </a>
+                            <a th:if="${item.foodPostId != null && item.otherPartyPhone != null && item.isRequestDonation != null && item.isRequestDonation}"
+                                th:href="@{/chat/room/{id}(id=${item.foodPostId}, otherPhone=${item.otherPartyPhone}, isRequest=true)}"
+                                class="btn-act btn-chat">
+                                <i class="fas fa-comments"></i>
+                                <span data-en="Chat with Donor" data-bn="দাতার সাথে চ্যাট">Chat with Donor</span>
+                            </a>
+
+                            <button type="button" class="btn-act btn-cancel"
+                                th:data-id="${item.id}"
+                                onclick="cancelActivity(this.getAttribute('data-id'))">
+                                <i class="fas fa-times"></i>
+                                <span data-en="Cancel" data-bn="বাতিল">Cancel</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- COMPLETED -->
+                    <div th:if="${item.status == 'Received'}">
+                        <span class="notice-completed">
+                            <i class="fas fa-check-circle"></i>
+                            <span data-en="Item received successfully!" data-bn="সামগ্রীটি সফলভাবে গ্রহণ করা হয়েছে!">Item received successfully!</span>
+                        </span>
+                    </div>
+
+                    <!-- CANCELLED -->
+                    <div th:if="${item.status == 'Cancelled'}">
+                        <span style="color: #f87171; font-size: 0.85rem;">
+                            <i class="fas fa-ban"></i>
+                            <span data-en="Claim cancelled" data-bn="আবেদন বাতিল করা হয়েছে">Claim cancelled</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. REQUESTS -->
+            <div th:each="req : ${foodRequests}" class="activity-card glass-panel"
+                data-item-tab="REQUEST"
+                th:data-item-type="${req.category != null && (req.category.contains('OTHER') || req.category.contains('ACCESSOR') || req.category.contains('BLANKET') || req.category.contains('DRESS'))} ? 'OTHER' : 'FOOD'">
+                
+                <div class="card-top">
+                    <div class="card-title-wrap">
+                        <h3 th:text="${req.foodName}">Need Warm Blankets</h3>
+                        <div class="card-date">
+                            <i class="fas fa-clock"></i>
+                            <span th:text="${#temporals.format(req.requestTime, 'dd MMM yyyy, hh:mm a')}">Date</span>
+                        </div>
+                    </div>
+
+                    <div class="card-badges">
+                        <span class="badge badge-role-request">
+                            <i class="fas fa-bullhorn"></i> <span data-en="REQUEST" data-bn="সাহায্যের আবেদন">REQUEST</span>
+                        </span>
+
+                        <span th:if="${req.category != null && (req.category.contains('OTHER') || req.category.contains('ACCESSOR') || req.category.contains('BLANKET') || req.category.contains('DRESS'))}" class="badge badge-cat-other">
+                            <i class="fas fa-box-open"></i> Accessories Request
+                        </span>
+                        <span th:if="${req.category == null || (!req.category.contains('OTHER') && !req.category.contains('ACCESSOR') && !req.category.contains('BLANKET') && !req.category.contains('DRESS'))}" class="badge badge-cat-food">
+                            <i class="fas fa-utensils"></i> Food Request
+                        </span>
+
+                        <span th:class="'status-pill status-' + ${#strings.toLowerCase(req.status)}" th:text="${req.status}">Pending</span>
+                    </div>
+                </div>
+
+                <div class="card-meta-grid">
+                    <div class="meta-field">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <div class="meta-lbl" data-en="Location" data-bn="এলাকা">Location</div>
+                            <div class="meta-val" th:text="${req.location}">Dhaka</div>
+                        </div>
+                    </div>
+
+                    <div class="meta-field">
+                        <i class="fas fa-cubes"></i>
+                        <div>
+                            <div class="meta-lbl" data-en="Quantity" data-bn="পরিমাণ">Quantity</div>
+                            <div class="meta-val" th:text="${req.quantity} + ' ' + (${req.category != null && (req.category.contains('OTHER') || req.category.contains('ACCESSOR') || req.category.contains('BLANKET') || req.category.contains('DRESS'))} ? 'Units' : 'Servings')">10 Servings</div>
+                        </div>
+                    </div>
+
+                    <div class="meta-field" th:if="${req.donorName != null}">
+                        <i class="fas fa-user-check"></i>
+                        <div>
+                            <div class="meta-lbl" data-en="Committed Donor" data-bn="সাহায্যকারী দাতা">Committed Donor</div>
+                            <div class="meta-val" th:text="${req.donorName}">Donor Name</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p th:if="${req.description != null && req.description != ''}" style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 14px;">
+                    <i class="fas fa-info-circle"></i> <span th:text="${req.description}">Note</span>
+                </p>
+
+                <div class="card-actions-bar">
+                    <div th:if="${req.status == 'Processing' && req.foodPostId != null && req.donorPhone != null}" class="action-buttons">
+                        <span class="notice-waiting">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span data-en="Donor is preparing item" data-bn="দাতা সামগ্রী প্রস্তুত করছেন">Donor is preparing item</span>
+                        </span>
+                        <a th:href="@{/chat/room/{id}(id=${req.foodPostId != null ? req.foodPostId : req.id}, otherPhone=${req.donorPhone}, isRequest=true)}" class="btn-act btn-chat">
+                            <i class="fas fa-comments"></i>
+                            <span data-en="Chat with Donor" data-bn="দাতার সাথে চ্যাট">Chat with Donor</span>
+                        </a>
+                    </div>
+
+                    <div th:if="${req.status == 'Pending'}">
+                        <span class="notice-waiting">
+                            <i class="fas fa-clock"></i>
+                            <span data-en="Waiting for a community donor" data-bn="সাহায্যকারী দাতার অপেক্ষায়">Waiting for a community donor</span>
+                        </span>
+                    </div>
+
+                    <div th:if="${req.status == 'Received'}">
+                        <span class="notice-completed">
+                            <i class="fas fa-check-circle"></i>
+                            <span data-en="Request successfully fulfilled!" data-bn="আবেদন সফলভাবে পূর্ণ হয়েছে!">Request successfully fulfilled!</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State Placeholder -->
+            <div id="emptyPlaceholder" class="empty-placeholder" style="display: none;">
+                <i class="fas fa-inbox"></i>
+                <h4 style="margin-bottom: 6px;" data-en="No Activity Found" data-bn="কোনো কার্যক্রম পাওয়া যায়নি">No Activity Found</h4>
+                <p data-en="There are no records matching your selected tab or filter." data-bn="আপনার নির্বাচিত বিভাগে কোনো তথ্য নেই।">
+                    There are no records matching your selected tab or filter.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'ALL';
+        let currentType = 'ALL';
+
+        function applyFilters() {
+            const cards = document.querySelectorAll('.activity-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const itemTab = card.getAttribute('data-item-tab');
+                const itemType = card.getAttribute('data-item-type');
+
+                const matchesTab = (currentTab === 'ALL') || (itemTab === currentTab);
+                const matchesType = (currentType === 'ALL') || (itemType === currentType);
+
+                if (matchesTab && matchesType) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const emptyPlaceholder = document.getElementById('emptyPlaceholder');
+            if (emptyPlaceholder) {
+                emptyPlaceholder.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+        }
+
+        // Tab Switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentTab = this.getAttribute('data-tab');
+                applyFilters();
+            });
+        });
+
+        // Type Filtering
+        document.querySelectorAll('.type-filter-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.type-filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentType = this.getAttribute('data-type');
+                applyFilters();
+            });
+        });
+
+        // Initial filter run
+        applyFilters();
+
+        // DONOR COMPLETE ACTION (Triggered when Donor clicks "Donate")
+        async function confirmDonation(id, foodName) {
+            const isBn = (localStorage.getItem('mukti_lang') || 'en') === 'bn';
+            const msg = isBn
+                ? `'${foodName}' এর দান সম্পন্ন করতে চান? আপনি কি সামগ্রীটি হস্তান্তর করেছেন?`
+                : `Are you sure you want to complete donation for '${foodName}'? Have you handed over the item?`;
+            
+            if (!confirm(msg)) return;
+
+            try {
+                const response = await fetch('/food/complete/' + id, { method: 'POST' });
+                const result = await response.text();
+                if (result === 'Success') {
+                    alert(isBn ? '✅ অভিনন্দন! দান সফলভাবে সম্পন্ন হয়েছে এবং পয়েন্ট যুক্ত হয়েছে।' : '✅ Congratulations! Donation completed successfully.');
+                    location.reload();
+                } else {
+                    alert(result);
+                }
+            } catch (err) {
+                alert('Connection error: ' + err.message);
+            }
+        }
+
+        // CANCEL ACTION (For Donor or Receiver)
+        async function cancelActivity(id) {
+            const isBn = (localStorage.getItem('mukti_lang') || 'en') === 'bn';
+            const msg = isBn ? 'আপনি কি নিশ্চিত যে এই কার্যক্রমটি বাতিল করতে চান?' : 'Are you sure you want to cancel this activity?';
+            if (!confirm(msg)) return;
+
+            try {
+                const response = await fetch('/food/cancel/' + id, { method: 'POST' });
+                const result = await response.text();
+                if (result === 'Success') {
+                    location.reload();
+                } else {
+                    alert(result);
+                }
+            } catch (err) {
+                alert('Connection error: ' + err.message);
+            }
+        }
+
+        // BLOCK USER ACTION
+        async function quickBlock(phone) {
+            const isBn = (localStorage.getItem('mukti_lang') || 'en') === 'bn';
+            const confirmMsg = isBn
+                ? `আপনি কি ${phone} নম্বর ব্যবহারকারীকে ব্লক করতে চান? তিনি আর আপনাকে মেসেজ পাঠাতে পারবেন না।`
+                : `Are you sure you want to block ${phone}? They won't be able to message you.`;
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const res = await fetch('/chat/block', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ targetPhone: phone })
+                });
+                if (res.ok) {
+                    alert(isBn ? '✅ ব্যবহারকারীকে সফলভাবে ব্লক করা হয়েছে।' : '✅ User has been blocked successfully.');
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    alert(err.error || 'Failed to block user');
+                }
+            } catch (err) {
+                alert('Connection error: ' + err.message);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUKTI APP | Fight Hunger, Reduce Waste - ক্ষুধা মুক্ত সমাজ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;500;600;700;800&family=Baloo+Da+2:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link th:href="@{/css/global.css}" rel="stylesheet">
+    <meta name="user-phone" th:content="${session.user != null ? session.user.phone : ''}">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-light: #34D399;
+            --primary-dark: #059669;
+            --secondary: #F59E0B;
+            --secondary-light: #FCD34D;
+            --accent: #F97316;
+            --ramadan-gold: #FBBF24;
+            --qurbani-rose: #E11D48;
+            --blanket-blue: #38BDF8;
+            --dark: #0f172a;
+            --dark-warm: #120e0a;
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: blur(24px);
+            --gradient: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            --gradient-warm: linear-gradient(135deg, #F59E0B 0%, #EA580C 100%);
+            --radius-xl: 32px;
+            --radius-lg: 20px;
+            --radius-pill: 50px;
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', 'Inter', 'Hind Siliguri', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--dark-warm);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Food Donation & Hunger Relief Hero Background */
+        .bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background:
+                linear-gradient(rgba(18, 14, 10, 0.82), rgba(26, 18, 12, 0.92)),
+                url('/images/hero-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .bg-glow {
+            position: absolute;
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.16) 0%, rgba(16, 185, 129, 0.05) 50%, transparent 75%);
+            border-radius: 50%;
+            filter: blur(70px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar.scrolled {
+            padding: 14px 5%;
+            background: rgba(18, 14, 10, 0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo i {
+            color: var(--secondary);
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.98rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: white;
+        }
+
+        .cta-btn {
+            background: var(--gradient);
+            color: white;
+            padding: 10px 22px;
+            border-radius: var(--radius-pill);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 140px 5% 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 780px;
+            z-index: 2;
+        }
+
+        .mission-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--secondary-light);
+            padding: 8px 20px;
+            border-radius: var(--radius-pill);
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+        }
+
+        .creator-hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 8px 18px;
+            border-radius: var(--radius-pill);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+            flex-wrap: wrap;
+        }
+
+        .creator-hero-pill span.highlight {
+            color: var(--secondary-light);
+            font-weight: 700;
+        }
+
+        .creator-hero-pill .uiu-tag {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            padding: 2px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .theme-text {
+            font-family: 'Noto Serif Bengali', 'Hind Siliguri', serif;
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 18px;
+            background: linear-gradient(135deg, #ffffff 40%, var(--secondary-light) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .motto-text {
+            font-family: 'Noto Serif Bengali', 'Hind Siliguri', serif;
+            font-size: 2rem;
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-weight: 700;
+            line-height: 1.3;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+        }
+
+        .tagline {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 36px;
+            max-width: 680px;
+        }
+
+        .tagline .highlight {
+            color: white;
+            font-weight: 600;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 54px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: var(--radius-lg);
+            font-weight: 700;
+            font-size: 1.05rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            white-space: nowrap;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-warm {
+            background: var(--gradient-warm);
+            color: white;
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-warm:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(245, 158, 11, 0.5);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: white;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            max-width: 820px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary);
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--secondary-light);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Section Commons */
+        section {
+            padding: 100px 5%;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-subtitle {
+            color: var(--secondary-light);
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 0.88rem;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .section-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: white;
+        }
+
+        /* ==========================================================
+           LIVE AVAILABLE FOOD SECTION (HOME PAGE)
+           ========================================================== */
+        .live-food-section {
+            background: linear-gradient(180deg, var(--dark-warm) 0%, rgba(22, 16, 12, 0.98) 100%);
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 90px 5%;
+        }
+
+        .home-search-box {
+            max-width: 760px;
+            margin: 0 auto 24px;
+            position: relative;
+        }
+
+        .home-search-box i {
+            position: absolute;
+            left: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+
+        .home-search-input {
+            width: 100%;
+            padding: 16px 24px 16px 56px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-pill);
+            color: white;
+            font-size: 1.05rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .home-search-input:focus {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+        }
+
+        .home-chips-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            max-width: 900px;
+            margin: 0 auto 40px;
+        }
+
+        .home-chip-btn {
+            padding: 7px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-pill);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .home-chip-btn:hover,
+        .home-chip-btn.active {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .home-food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 28px;
+            max-width: 1200px;
+            margin: 0 auto 40px;
+        }
+
+        .home-food-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 38px 28px 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .home-food-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Home Distinct Cart Variants */
+        .home-food-card.cart-ramadan {
+            border: 2px solid rgba(245, 158, 11, 0.55);
+            background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.15), rgba(16, 185, 129, 0.06), rgba(18, 14, 10, 0.95));
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.15);
+        }
+        .home-food-card.cart-ramadan:hover {
+            border-color: #fbbf24;
+            box-shadow: 0 16px 40px rgba(245, 158, 11, 0.35);
+        }
+
+        .home-food-card.cart-qurbani {
+            border: 2px solid rgba(225, 29, 72, 0.55);
+            background: radial-gradient(circle at top right, rgba(225, 29, 72, 0.15), rgba(20, 10, 12, 0.95));
+            box-shadow: 0 6px 20px rgba(225, 29, 72, 0.15);
+        }
+        .home-food-card.cart-qurbani:hover {
+            border-color: #fb7185;
+            box-shadow: 0 16px 40px rgba(225, 29, 72, 0.35);
+        }
+
+        .home-food-card.cart-blanket {
+            border: 2px solid rgba(139, 92, 246, 0.55);
+            background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.15), rgba(15, 10, 25, 0.95));
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.15);
+        }
+        .home-food-card.cart-blanket:hover {
+            border-color: #c4b5fd;
+            box-shadow: 0 16px 40px rgba(139, 92, 246, 0.35);
+        }
+
+        .home-food-card.cart-regular {
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.1), rgba(10, 20, 15, 0.95));
+        }
+        .home-food-card.cart-regular:hover {
+            border-color: #34d399;
+            box-shadow: 0 16px 40px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Top Cart Ribbon Strip */
+        .card-cart-ribbon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 5px 14px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .ribbon-ramadan {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            color: #120e0a;
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+        }
+        .ribbon-qurbani {
+            background: linear-gradient(90deg, #e11d48, #be123c);
+            color: white;
+            box-shadow: 0 2px 10px rgba(225, 29, 72, 0.4);
+        }
+        .ribbon-blanket {
+            background: linear-gradient(90deg, #8b5cf6, #6d28d9);
+            color: white;
+            box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+        }
+        .ribbon-regular {
+            background: linear-gradient(90deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Cart-specific receive buttons on home page */
+        .home-food-card.cart-ramadan .btn-warm:not([href]) {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #120e0a;
+            font-weight: 800;
+            box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35);
+        }
+        .home-food-card.cart-qurbani .btn-warm:not([href]) {
+            background: linear-gradient(135deg, #e11d48, #be123c);
+            color: white;
+            box-shadow: 0 6px 18px rgba(225, 29, 72, 0.35);
+        }
+        .home-food-card.cart-blanket .btn-warm:not([href]) {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+            box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
+        }
+        .home-food-card.cart-regular .btn-warm:not([href]) {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+        }
+
+        .campaign-indicator {
+            padding: 3px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .ci-regular { background: rgba(16, 185, 129, 0.15); color: var(--primary-light); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .ci-ramadan { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
+        .ci-qurbani { background: rgba(225, 29, 72, 0.15); color: #fb7185; border: 1px solid rgba(225, 29, 72, 0.35); }
+        .ci-blanket { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4); }
+
+        .donor-locked-badge {
+            margin-top: 14px;
+            padding: 8px 14px;
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px dashed rgba(245, 158, 11, 0.35);
+            border-radius: var(--radius-lg);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--secondary-light);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .mini-login-link {
+            background: var(--secondary);
+            color: #120e0a !important;
+            padding: 3px 10px;
+            border-radius: var(--radius-pill);
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            margin-left: 4px;
+            display: inline-block;
+        }
+
+        .mini-login-link:hover {
+            background: var(--secondary-light);
+            transform: scale(1.05);
+        }
+
+        .home-donor-info {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--glass-border);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .home-donor-info a {
+            color: var(--secondary-light);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* ==========================================================
+           CAMPAIGNS SECTION: RAMADAN & QURBANI
+           ========================================================== */
+        .campaigns-section {
+            background: linear-gradient(180deg, rgba(18, 14, 10, 0.6) 0%, rgba(24, 17, 12, 0.95) 100%);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .campaigns-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .campaign-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .campaign-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .campaign-card.ramadan::before {
+            background: linear-gradient(90deg, #F59E0B, #FCD34D);
+        }
+
+        .campaign-card.qurbani::before {
+            background: linear-gradient(90deg, #E11D48, #F43F5E);
+        }
+
+        .campaign-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .campaign-card.ramadan:hover {
+            border-color: rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .campaign-card.qurbani:hover {
+            border-color: rgba(225, 29, 72, 0.4);
+            background: rgba(225, 29, 72, 0.05);
+        }
+
+        .campaign-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .campaign-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .campaign-card.ramadan .campaign-icon {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--ramadan-gold);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .campaign-card.qurbani .campaign-icon {
+            background: rgba(225, 29, 72, 0.15);
+            color: #fb7185;
+            border: 1px solid rgba(225, 29, 72, 0.3);
+        }
+
+        .bonus-badge {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
+            font-size: 0.85rem;
+            font-weight: 800;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .campaign-title {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .campaign-desc {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+        .points-summary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+
+        .points-summary span {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .points-summary strong {
+            color: var(--secondary-light);
+            font-size: 1.15rem;
+            font-weight: 800;
+        }
+
+        /* ==========================================================
+           BLANKET & DRESS SEPARATE SECTION (30 POINTS)
+           ========================================================== */
+        .blanket-section {
+            background: linear-gradient(135deg, rgba(30, 27, 75, 0.4) 0%, rgba(18, 14, 10, 0.9) 100%);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 110px 5%;
+        }
+
+        .blanket-box {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+            border: 1px solid rgba(129, 140, 248, 0.3);
+            border-radius: 36px;
+            padding: 56px 48px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 48px;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mega-bonus-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #8B5CF6, #6366F1);
+            color: white;
+            padding: 8px 20px;
+            border-radius: var(--radius-pill);
+            font-size: 0.9rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+        }
+
+        .blanket-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        .blanket-desc {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        .blanket-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 36px;
+        }
+
+        .b-feature {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .b-feature i {
+            color: #a78bfa;
+            font-size: 1.3rem;
+        }
+
+        .b-feature span {
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .blanket-reward-card {
+            background: rgba(18, 14, 10, 0.7);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 28px;
+            padding: 40px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+        }
+
+        .reward-big-pts {
+            font-size: 5rem;
+            font-weight: 900;
+            color: #c4b5fd;
+            line-height: 1;
+            margin-bottom: 8px;
+            letter-spacing: -2px;
+        }
+
+        /* ==========================================================
+           CREATORS SECTION: SHAMSIL AREFIN & NAFISA TASNIM SOHEL
+           CSE UNITED INTERNATIONAL UNIVERSITY
+           ========================================================== */
+        .creators-section {
+            background: var(--dark-warm);
+        }
+
+        .creators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 36px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .creator-profile-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 40px 36px;
+            transition: all 0.35s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .creator-profile-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.04);
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
+        }
+
+        .creator-avatar-wrap {
+            width: 80px;
+            height: 80px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: 800;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.35);
+        }
+
+        .creator-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 6px;
+        }
+
+        .creator-role {
+            color: var(--secondary-light);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .creator-dept {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .creator-dept i {
+            color: #ef4444;
+        }
+
+        .creator-quote {
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            border-left: 3px solid var(--secondary);
+            padding-left: 16px;
+            margin-top: 20px;
+        }
+
+        /* Features Section */
+        .features {
+            background: linear-gradient(180deg, var(--dark-warm) 0%, rgba(18, 14, 10, 0.7) 100%);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary-light);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: var(--primary-light);
+            margin-bottom: 24px;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .feature-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .feature-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(180deg, rgba(18, 14, 10, 0.8) 0%, var(--dark-warm) 100%);
+            text-align: center;
+            padding: 100px 5%;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 36px;
+            padding: 70px 40px;
+            max-width: 900px;
+            margin: 0 auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Footer */
+        .footer {
+            background: #0d0a07;
+            border-top: 1px solid var(--glass-border);
+            padding: 80px 5% 40px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.5fr;
+            gap: 60px;
+            max-width: 1200px;
+            margin: 0 auto 60px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .footer-desc {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-light);
+        }
+
+        .footer-bottom {
+            padding-top: 32px;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 900px) {
+            .theme-text { font-size: 3.5rem; }
+            .blanket-box { grid-template-columns: 1fr; padding: 40px 24px; }
+            .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-wrapper"></div>
+    <div class="bg-glow" style="top: 0; right: 0;"></div>
+    <div class="bg-glow" style="bottom: 0; left: 0;"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar" id="navbar">
+        <a th:href="@{/}" class="logo">
+            <i class="fas fa-hands-helping"></i>
+            MUKTI APP
+        </a>
+
+        <div class="nav-links">
+            <a href="#home" class="nav-link" data-en="Home" data-bn="হোম">Home</a>
+            <a href="#available-food" class="nav-link" data-en="Available Food" data-bn="উপলব্ধ খাবার">Available Food</a>
+            <a href="#campaigns" class="nav-link" data-en="Ramadan & Qurbani" data-bn="রমজান ও কোরবানি">Ramadan & Qurbani</a>
+            <a href="#blankets" class="nav-link" data-en="Other Accessories (30 Pts)" data-bn="অন্যান্য সামগ্রী (৩০ পয়েন্ট)">Other Accessories (30 Pts)</a>
+            <a href="#creators" class="nav-link" data-en="Creators" data-bn="উদ্যোক্তা">Creators</a>
+            <a th:href="@{/food/receive-page}" class="nav-link" data-en="Find Food" data-bn="খাবার খুঁজুন">Find Food</a>
+            <a th:href="@{/food/leaderboard}" class="nav-link" data-en="Leaderboard" data-bn="সেরা দাতা">Leaderboard</a>
+            
+            <a th:if="${session.user == null}" th:href="@{/login}" class="nav-link" data-en="Login" data-bn="লগইন">Login</a>
+            <a th:if="${session.user == null}" th:href="@{/register}" class="cta-btn" data-en="Get Started" data-bn="শুরু করুন">Get Started</a>
+
+            <a th:if="${session.user != null}" th:href="@{/dashboard}" class="cta-btn" style="background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);" data-en="Dashboard" data-bn="ড্যাশবোর্ড">Dashboard</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+
+            <!-- Creator Credit Pill in Hero -->
+            <div class="creator-hero-pill">
+                <i class="fas fa-graduation-cap" style="color: var(--secondary-light);"></i>
+                <span data-en="Created by" data-bn="তৈরি করেছেন">Created by</span>
+                <span class="highlight">Shamsil Arefin & Nafisa Tasnim Sohel</span>
+                <span class="uiu-tag">CSE UNITED INTERNATIONAL UNIVERSITY</span>
+            </div>
+
+            <div class="mission-badge">
+                <i class="fas fa-heart"></i>
+                <span data-en="Zero Hunger &bull; Food Sharing Network" data-bn="ক্ষুধামুক্ত সমাজ &bull; খাদ্য বিতরণ নেটওয়ার্ক">Zero Hunger &bull; Food Sharing Network</span>
+            </div>
+
+            <h1 class="theme-text" data-en="MUKTI" data-bn="মুক্তি">মুক্তি</h1>
+            <div class="motto-text" data-en="Freedom from food waste &bull; Freedom from hunger" data-bn="খাবার অপচয় থেকে মুক্তি &bull; ক্ষুধা থেকে মুক্তি">
+                খাবার অপচয় থেকে মুক্তি &bull; ক্ষুধা থেকে মুক্তি
+            </div>
+
+            <p class="tagline" data-en="Connecting surplus food and clothing with those experiencing insecurity. Together, we eliminate waste and fight hunger for a dignified future." data-bn="উদ্বৃত্ত খাবার এবং প্রয়োজনীয় বস্ত্র পৌঁছে যাক সুবিধাবঞ্চিত মানুষের কাছে। আসুন একসাথে অপচয় রোধ করি এবং একটি ক্ষুধামুক্ত মানবিক সমাজ গড়ি।">
+                Connecting surplus food and clothing with those experiencing insecurity. Together, we eliminate waste and fight hunger for a dignified future.
+            </p>
+
+            <div class="hero-buttons">
+                <a th:href="@{/food/donate}" class="btn btn-warm">
+                    <i class="fas fa-utensils"></i>
+                    <span data-en="Donate Food Now" data-bn="খাবার দান করুন">Donate Food Now</span>
+                </a>
+                <a href="#available-food" class="btn btn-primary">
+                    <i class="fas fa-search-location"></i>
+                    <span data-en="Find Food by Location" data-bn="এলাকাভিত্তিক খাবার খুঁজুন">Find Food by Location</span>
+                </a>
+                <a href="#campaigns" class="btn btn-secondary">
+                    <i class="fas fa-star"></i>
+                    <span data-en="Ramadan & Qurbani (+5 Pts)" data-bn="রমজান ও কোরবানি (+৫ পয়েন্ট)">Ramadan & Qurbani (+5 Pts)</span>
+                </a>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">2.5T+</span>
+                    <span class="stat-label" data-en="Food Waste Prevented" data-bn="অপচয় রোধকৃত খাবার">Food Waste Prevented</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">8,500+</span>
+                    <span class="stat-label" data-en="Meals & Packets Shared" data-bn="বিতরণকৃত খাবার">Meals & Packets Shared</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">450+</span>
+                    <span class="stat-label" data-en="Active Donors" data-bn="নিবেদিতপ্রাণ দাতা">Active Donors</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">30 Pts</span>
+                    <span class="stat-label" data-en="Blanket & Dress Reward" data-bn="কম্বল ও পোশাক বোনাস">Blanket & Dress Reward</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         AVAILABLE FOOD DONATIONS SECTION (WITHOUT LOGIN VISIBLE)
+         ========================================================== -->
+    <section class="live-food-section" id="available-food">
+        <div class="section-header">
+            <span class="section-subtitle" data-en="Live Community Food Sharing" data-bn="সরাসরি খাদ্য বিতরণ উদ্যোগ">Live Community Food Sharing</span>
+            <h2 class="section-title" data-en="Available Food Donations Nearby" data-bn="আশেপাশের উপলব্ধ খাবার ও সামগ্রী">Available Food Donations Nearby</h2>
+            <p style="color: var(--text-muted); max-width: 680px; margin: 16px auto 0;" data-en="Anyone can see available meals and locations without login. To protect community privacy, please login to view donor contact details and receive items." data-bn="লগইন ছাড়াই যে কেউই উপলব্ধ খাবার ও এর এলাকা দেখতে পারবেন। তবে দাতার তথ্য দেখতে এবং খাবার গ্রহণ করতে অনুগ্রহ করে লগইন করুন।">
+                Anyone can see available meals and locations without login. To protect community privacy, please login to view donor contact details and receive items.
+            </p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="home-search-box">
+            <i class="fas fa-search-location"></i>
+            <input type="text" id="homeFoodSearch" class="home-search-input"
+                placeholder="Search by area or location (e.g. Dhanmondi, Gulshan, Mirpur, UIU)..."
+                data-placeholder-en="Search by area or location (e.g. Dhanmondi, Gulshan, Mirpur, UIU)..."
+                data-placeholder-bn="এলাকা দিয়ে খুঁজুন (যেমন: ধানমন্ডি, গুলশান, মিরপুর, ইউআইইউ)...">
+        </div>
+
+        <!-- Quick Area Filter Chips -->
+        <div class="home-chips-row" id="homeAreaChips">
+            <button type="button" class="home-chip-btn active" data-area="ALL">
+                <span data-en="All Areas" data-bn="সকল এলাকা">All Areas</span>
+            </button>
+            <button type="button" class="home-chip-btn" data-area="Dhanmondi">Dhanmondi</button>
+            <button type="button" class="home-chip-btn" data-area="Gulshan">Gulshan</button>
+            <button type="button" class="home-chip-btn" data-area="Banani">Banani</button>
+            <button type="button" class="home-chip-btn" data-area="Mirpur">Mirpur</button>
+            <button type="button" class="home-chip-btn" data-area="Uttara">Uttara</button>
+            <button type="button" class="home-chip-btn" data-area="Mohammadpur">Mohammadpur</button>
+            <button type="button" class="home-chip-btn" data-area="Badda">Badda</button>
+            <button type="button" class="home-chip-btn" data-area="UIU">UIU Campus</button>
+            <button type="button" class="home-chip-btn" data-area="Old Dhaka">Old Dhaka</button>
+        </div>
+
+        <!-- Food Listings Grid -->
+        <div class="home-food-grid" id="homeFoodGrid">
+            <!-- Empty state -->
+            <div th:if="${foods == null || foods.size() == 0}" class="glass-panel" style="grid-column: 1 / -1; padding: 50px 20px; text-align: center;">
+                <i class="fas fa-box-open" style="font-size: 3rem; color: var(--secondary); opacity: 0.5; margin-bottom: 16px;"></i>
+                <h3 style="color: white; margin-bottom: 8px;" data-en="No food donations currently available" data-bn="বর্তমানে কোনো খাদ্য অনুদান নেই">No food donations currently available</h3>
+                <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 20px;" data-en="Be a community hero and share surplus food or clothes today!" data-bn="আজই উদ্বৃত্ত খাবার বা শীতবস্ত্র দান করে এগিয়ে আসুন!">
+                    Be a community hero and share surplus food or clothes today!
+                </p>
+                <a th:href="@{/food/donate}" class="btn btn-warm">
+                    <i class="fas fa-plus"></i> <span data-en="Make a Donation" data-bn="দান করুন">Make a Donation</span>
+                </a>
+            </div>
+
+            <!-- Food Cards -->
+            <div class="home-food-card" th:each="food : ${foods}" th:if="${!food.received}"
+                th:classappend="${food.category != null && food.category.contains('RAMADAN')} ? ' cart-ramadan' : (${food.category != null && food.category.contains('QURBAN')} ? ' cart-qurbani' : (${food.category != null && (food.category.contains('BLANKET') || food.category.contains('DRESS') || food.category.contains('CLOTHES') || food.category.contains('OTHER') || food.category.contains('ACCESSOR'))} ? ' cart-blanket' : ' cart-regular'))"
+                th:attr="data-location=${food.location != null ? food.location.toLowerCase() : ''}, data-category=${food.category != null ? food.category.toUpperCase() : 'REGULAR'}">
+                
+                <!-- Distinct Cart Top Ribbon Strip -->
+                <div th:if="${food.category != null && food.category.contains('RAMADAN')}" class="card-cart-ribbon ribbon-ramadan">
+                    <i class="fas fa-moon"></i> <span data-en="SPECIAL RAMADAN CART &bull; RAMADAN TIME ONLY" data-bn="রমজান স্পেশাল কার্ট &bull; শুধুমাত্র মাহে রমজানে ব্যবহারযোগ্য">SPECIAL RAMADAN CART &bull; RAMADAN TIME ONLY</span>
+                </div>
+                <div th:if="${food.category != null && food.category.contains('QURBAN')}" class="card-cart-ribbon ribbon-qurbani">
+                    <i class="fas fa-drumstick-bite"></i> <span data-en="QURBANI MEAT CART &bull; EID-UL-ADHA SPECIAL" data-bn="কোরবানি গোশত কার্ট &bull; ঈদ স্পেশাল">QURBANI MEAT CART &bull; EID-UL-ADHA SPECIAL</span>
+                </div>
+                <div th:if="${food.category != null && (food.category.contains('BLANKET') || food.category.contains('DRESS') || food.category.contains('CLOTHES') || food.category.contains('OTHER') || food.category.contains('ACCESSOR'))}" class="card-cart-ribbon ribbon-blanket">
+                    <i class="fas fa-box-open"></i> <span data-en="OTHER ACCESSORIES &bull; 30 PTS" data-bn="অন্যান্য সামগ্রী কার্ট &bull; ৩০ পয়েন্ট">OTHER ACCESSORIES &bull; 30 PTS</span>
+                </div>
+                <div th:if="${food.category == null || food.category == 'REGULAR' || (!food.category.contains('RAMADAN') && !food.category.contains('QURBAN') && !food.category.contains('BLANKET') && !food.category.contains('DRESS') && !food.category.contains('CLOTHES') && !food.category.contains('OTHER') && !food.category.contains('ACCESSOR'))}" class="card-cart-ribbon ribbon-regular">
+                    <i class="fas fa-utensils"></i> <span data-en="DAILY SURPLUS MEAL CART" data-bn="দৈনিক উদ্বৃত্ত খাদ্য কার্ট">DAILY SURPLUS MEAL CART</span>
+                </div>
+                
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                        <span th:if="${food.category != null && food.category.contains('RAMADAN')}" class="campaign-indicator ci-ramadan">
+                            <i class="fas fa-moon"></i> Ramadan (+5 pts)
+                        </span>
+                        <span th:if="${food.category != null && food.category.contains('QURBAN')}" class="campaign-indicator ci-qurbani">
+                            <i class="fas fa-drumstick-bite"></i> Qurbani (+5 pts)
+                        </span>
+                        <span th:if="${food.category != null && (food.category.contains('BLANKET') || food.category.contains('DRESS') || food.category.contains('CLOTHES') || food.category.contains('OTHER') || food.category.contains('ACCESSOR'))}" class="campaign-indicator ci-blanket">
+                            <i class="fas fa-box-open"></i> Other Accessories (30 pts)
+                        </span>
+                        <span th:if="${food.category == null || food.category == 'REGULAR' || (!food.category.contains('RAMADAN') && !food.category.contains('QURBAN') && !food.category.contains('BLANKET') && !food.category.contains('DRESS') && !food.category.contains('CLOTHES') && !food.category.contains('OTHER') && !food.category.contains('ACCESSOR'))}" class="campaign-indicator ci-regular">
+                            <i class="fas fa-utensils"></i> Food Donation
+                        </span>
+
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">
+                            <i class="fas fa-cubes"></i> <span th:text="${food.quantity} + ' Units'">1 Units</span>
+                        </span>
+                    </div>
+
+                    <h3 style="color: white; font-size: 1.35rem; font-weight: 800; margin-bottom: 12px;" th:text="${food.foodName}">Item Name</h3>
+
+                    <!-- Location is ALWAYS displayed even without login -->
+                    <p style="color: var(--secondary-light); font-weight: 700; margin-bottom: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-map-marker-alt" style="color: #ef4444;"></i>
+                        <span class="h-food-loc" th:text="${food.location}">Location</span>
+                    </p>
+
+                    <p th:if="${food.expireTime != null}" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 8px;">
+                        <i class="fas fa-hourglass-end" style="color: var(--secondary); margin-right: 6px;"></i>
+                        <span data-en="Expires: " data-bn="মেয়াদ: ">Expires: </span>
+                        <span th:text="${#temporals.format(food.expireTime, 'dd MMM, hh:mm a')}">Time</span>
+                    </p>
+
+                    <p th:if="${food.description != null && food.description != ''}" style="color: rgba(255, 255, 255, 0.7); font-size: 0.88rem; margin-bottom: 14px; line-height: 1.5;">
+                        <span th:text="${food.description}">Description</span>
+                    </p>
+
+                    <!-- Donor info: VISIBLE ONLY IF LOGGED IN -->
+                    <div th:if="${session.user != null}" class="home-donor-info">
+                        <div>
+                            <i class="fas fa-user-circle" style="color: var(--secondary); margin-right: 6px;"></i>
+                            <span data-en="Donor:" data-bn="দাতা:">Donor:</span>
+                            <strong th:text="${food.donorName != null && food.donorName != '' ? food.donorName : 'Community Donor'}" style="color: white;">Donor</strong>
+                        </div>
+                        <div th:if="${food.donorPhone != null && food.donorPhone != ''}">
+                            <i class="fas fa-phone" style="color: var(--primary-light); margin-right: 6px;"></i>
+                            <a th:href="'tel:' + ${food.donorPhone}" th:text="${food.donorPhone}">01XXXXXXX</a>
+                        </div>
+                    </div>
+
+                    <!-- Donor info: HIDDEN IF GUEST (NOT LOGGED IN) -->
+                    <div th:if="${session.user == null}" class="donor-locked-badge">
+                        <i class="fas fa-lock"></i>
+                        <span data-en="Donor details hidden &bull; Login to view" data-bn="দাতার তথ্য সুরক্ষিত &bull; দেখতে লগইন করুন">Donor details hidden &bull; Login to view</span>
+                        <a th:href="@{/login}" class="mini-login-link" data-en="Login" data-bn="লগইন">Login</a>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <!-- Receive Button: Active if logged in; Links directly to /login if guest -->
+                    <button th:if="${session.user != null}" class="btn btn-warm" style="width: 100%; justify-content: center; padding: 12px;"
+                        th:id="'h-btn-' + ${food.id}" th:onclick="'receiveFoodHome(' + ${food.id} + ')'">
+                        <i class="fas fa-hand-holding-heart"></i>
+                        <span th:id="'h-text-' + ${food.id}" data-en="Receive" data-bn="গ্রহণ করুন">Receive</span>
+                    </button>
+
+                    <a th:if="${session.user == null}" th:href="@{/login}" class="btn btn-warm" style="width: 100%; justify-content: center; padding: 12px;" title="Login to receive this item">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span data-en="Login to Receive" data-bn="গ্রহণ করতে লগইন করুন">Login to Receive</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px;">
+            <a th:href="@{/food/receive-page}" class="btn btn-secondary">
+                <i class="fas fa-search-plus"></i>
+                <span data-en="View All Food Donations" data-bn="সকল খাদ্য অনুদান দেখুন">View All Food Donations</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         RAMADAN & QURBAN SECTION (+5 BONUS POINTS)
+         ========================================================== -->
+    <section class="campaigns-section" id="campaigns">
+        <div class="section-header">
+            <span class="section-subtitle" data-en="Sacred Giving & Festive Drives" data-bn="পবিত্র উৎসব ও বিশেষ উদ্যোগ">Sacred Giving & Festive Drives</span>
+            <h2 class="section-title" data-en="Ramadan & Qurbani Drives" data-bn="রমজান ও কোরবানি স্পেশাল ড্রাইভ">Ramadan & Qurbani Drives</h2>
+            <p style="color: var(--text-muted); max-width: 650px; margin: 16px auto 0;" data-en="Multiply your rewards during holy occasions. Earn +5 bonus points for every donation of Iftar, Sehri, or Qurbani meat." data-bn="পবিত্র উৎসবে সুবিধাবঞ্চিত মানুষের পাশে দাঁড়ান। ইফতার, সেহরি বা কোরবানির মাংস দান করে প্রতিটি তালিকায় অর্জন করুন অতিরিক্ত ৫ বোনাস পয়েন্ট!">
+                Multiply your rewards during holy occasions. Earn +5 bonus points for every donation of Iftar, Sehri, or Qurbani meat.
+            </p>
+        </div>
+
+        <div class="campaigns-grid">
+            <!-- Ramadan Drive Card -->
+            <div class="campaign-card ramadan">
+                <div>
+                    <div class="campaign-top">
+                        <div class="campaign-icon">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <div class="bonus-badge">
+                            <i class="fas fa-plus"></i> <span data-en="5 BONUS POINTS" data-bn="৫ বোনাস পয়েন্ট">5 BONUS POINTS</span>
+                        </div>
+                    </div>
+
+                    <h3 class="campaign-title" data-en="Holy Ramadan Drive" data-bn="পবিত্র মাহে রমজান উদ্যোগ">Holy Ramadan Drive</h3>
+                    <p class="campaign-desc" data-en="Donate freshly cooked Iftar packs and wholesome Sehri meals to fasting daily wage earners, street children, and underprivileged families." data-bn="রোজাদার সুবিধাবঞ্চিত মানুষ, দিনমজুর ও এতিম শিশুদের জন্য স্বাস্থ্যকর ইফতার ও পুষ্টিকর সেহরি বিতরণ করুন।">
+                        Donate freshly cooked Iftar packs and wholesome Sehri meals to fasting daily wage earners, street children, and underprivileged families.
+                    </p>
+
+                    <div class="points-summary">
+                        <span data-en="Reward per donation:" data-bn="প্রতিটি দানে পুরস্কার:">Reward per donation:</span>
+                        <strong data-en="10 Base + 5 Bonus = 15 Points" data-bn="১০ মূল + ৫ বোনাস = ১৫ পয়েন্ট">10 Base + 5 Bonus = 15 Points</strong>
+                    </div>
+                </div>
+
+                <a th:href="@{/food/donate(campaign='RAMADAN')}" class="btn btn-warm" style="width: 100%;">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span data-en="Donate Iftar & Sehri (+5 Pts)" data-bn="ইফতার ও সেহরি দান করুন (+৫ পয়েন্ট)">Donate Iftar & Sehri (+5 Pts)</span>
+                </a>
+            </div>
+
+            <!-- Qurbani Drive Card -->
+            <div class="campaign-card qurbani">
+                <div>
+                    <div class="campaign-top">
+                        <div class="campaign-icon">
+                            <i class="fas fa-drumstick-bite"></i>
+                        </div>
+                        <div class="bonus-badge">
+                            <i class="fas fa-plus"></i> <span data-en="5 BONUS POINTS" data-bn="৫ বোনাস পয়েন্ট">5 BONUS POINTS</span>
+                        </div>
+                    </div>
+
+                    <h3 class="campaign-title" data-en="Qurbani Meat Drive" data-bn="পবিত্র কোরবানি মাংস বিতরণ">Qurbani Meat Drive</h3>
+                    <p class="campaign-desc" data-en="Share clean, packaged Qurbani meat with families who rarely get the opportunity to eat meat. Bring smiles to every doorstep on Eid-ul-Adha." data-bn="পবিত্র ঈদুল আযহায় সুবিধাবঞ্চিত মানুষের সাথে কোরবানির মাংস ভাগ করে নিন। সবার ঘরে ঈদের আনন্দ পৌঁছে দিন।">
+                        Share clean, packaged Qurbani meat with families who rarely get the opportunity to eat meat. Bring smiles to every doorstep on Eid-ul-Adha.
+                    </p>
+
+                    <div class="points-summary">
+                        <span data-en="Reward per donation:" data-bn="প্রতিটি দানে পুরস্কার:">Reward per donation:</span>
+                        <strong data-en="10 Base + 5 Bonus = 15 Points" data-bn="১০ মূল + ৫ বোনাস = ১৫ পয়েন্ট">10 Base + 5 Bonus = 15 Points</strong>
+                    </div>
+                </div>
+
+                <a th:href="@{/food/donate(campaign='QURBANI')}" class="btn" style="background: linear-gradient(135deg, #E11D48, #BE123C); color: white; width: 100%;">
+                    <i class="fas fa-heart"></i>
+                    <span data-en="Donate Qurbani Meat (+5 Pts)" data-bn="কোরবানির মাংস দান করুন (+৫ পয়েন্ট)">Donate Qurbani Meat (+5 Pts)</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         SEPARATE SECTION: OTHER ACCESSORIES (30 BONUS POINTS)
+         ========================================================== -->
+    <section class="blanket-section" id="blankets">
+        <div class="blanket-box">
+            <div>
+                <div class="mega-bonus-tag">
+                    <i class="fas fa-award"></i>
+                    <span data-en="SEPARATE SECTION &bull; MEGA 30 POINTS REWARD" data-bn="আলাদা সেকশন &bull; মেগা ৩০ পয়েন্ট বোনাস">SEPARATE SECTION &bull; MEGA 30 POINTS REWARD</span>
+                </div>
+
+                <h2 class="blanket-title" data-en="Warmth & Dignity: Other Accessories & Clothes" data-bn="অন্যান্য সামগ্রী: শীতবস্ত্র, কম্বল ও পরিধেয় পোশাক">
+                    Warmth & Dignity: Other Accessories & Clothes
+                </h2>
+
+                <p class="blanket-desc" data-en="Beyond meals, clothing, blankets, and essential daily accessories are fundamental human needs. Donate winter blankets, warm jackets, clean clothes, shoes, bags, and daily essentials. Zero food items allowed in this cart!" data-bn="খাদ্যের পাশাপাশি শীতবস্ত্র, কম্বল ও প্রয়োজনীয় সামগ্রী মানুষের মৌলিক অধিকার। সুবিধাবঞ্চিত শিশু ও গৃহহীনদের জন্য কম্বল, চাদর, জামাকাপড় ও প্রয়োজনীয় অনুষঙ্গ দান করুন। এই কার্টে কোনো খাবার নয়!">
+                    Beyond meals, clothing, blankets, and essential daily accessories are fundamental human needs. Donate winter blankets, warm jackets, clean clothes, shoes, bags, and daily essentials. Zero food items allowed in this cart!
+                </p>
+
+                <div class="blanket-features">
+                    <div class="b-feature">
+                        <i class="fas fa-bed"></i>
+                        <span data-en="Warm Blankets & Quilts" data-bn="শীতের কম্বল ও লেপ">Warm Blankets & Quilts</span>
+                    </div>
+                    <div class="b-feature">
+                        <i class="fas fa-tshirt"></i>
+                        <span data-en="Clean Dresses & Clothes" data-bn="পরিষ্কার পোশাক ও জামাকাপড়">Clean Dresses & Clothes</span>
+                    </div>
+                    <div class="b-feature">
+                        <i class="fas fa-box-open"></i>
+                        <span data-en="Shoes, Bags & Essentials" data-bn="জুতো, ব্যাগ ও প্রয়োজনীয় সামগ্রী">Shoes, Bags & Essentials</span>
+                    </div>
+                    <div class="b-feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <span data-en="Dignity & Health Protection" data-bn="স্বাস্থ্য ও মর্যাদা রক্ষা">Dignity & Health Protection</span>
+                    </div>
+                </div>
+
+                <a th:href="@{/food/donate(campaign='OTHER_ACCESSORIES')}" class="btn" style="background: linear-gradient(135deg, #8B5CF6, #6366F1); color: white; padding: 16px 36px; font-size: 1.1rem;">
+                    <i class="fas fa-gift"></i>
+                    <span data-en="Donate Other Accessories (+30 Pts)" data-bn="অন্যান্য সামগ্রী দান করুন (+৩০ পয়েন্ট)">Donate Other Accessories (+30 Pts)</span>
+                </a>
+            </div>
+
+            <div class="blanket-reward-card">
+                <i class="fas fa-crown" style="font-size: 3rem; color: #f59e0b; margin-bottom: 16px;"></i>
+                <div class="reward-big-pts">+30</div>
+                <h4 style="color: white; font-size: 1.3rem; margin-bottom: 8px;" data-en="Community Hero Points" data-bn="কমিউনিটি হিরো পয়েন্ট">Community Hero Points</h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem;" data-en="Awarded directly to your profile for every verified blanket or dress donation." data-bn="প্রতিটি কম্বল ও পোশাক সহায়তার জন্য সরাসরি আপনার প্রোফাইলে যুক্ত হবে।">
+                    Awarded directly to your profile for every verified blanket or dress donation.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         CREATORS SHOWCASE SECTION
+         Shamsil Arefin & Nafisa Tasnim Sohel
+         CSE UNITED INTERNATIONAL UNIVERSITY
+         ========================================================== -->
+    <section class="creators-section" id="creators">
+        <div class="section-header">
+            <span class="section-subtitle" data-en="Project Innovators" data-bn="প্রকল্প উদ্যোক্তা">Project Innovators</span>
+            <h2 class="section-title" data-en="Meet the Creators" data-bn="অ্যাপ নির্মাতাদের পরিচিতি">Meet the Creators</h2>
+            <div style="display: flex; justify-content: center; margin-top: 14px;">
+                <span class="uiu-tag" style="font-size: 0.9rem; padding: 6px 18px;">
+                    <i class="fas fa-university"></i>
+                    CSE UNITED INTERNATIONAL UNIVERSITY
+                </span>
+            </div>
+        </div>
+
+        <div class="creators-grid">
+            <!-- Shamsil Arefin -->
+            <div class="creator-profile-card">
+                <div class="creator-avatar-wrap">
+                    SA
+                </div>
+                <h3 class="creator-name">Shamsil Arefin</h3>
+                <div class="creator-role" data-en="Lead Developer & System Architect" data-bn="প্রধান ডেভেলপার ও সিস্টেম আর্কিটেক্ট">Lead Developer & System Architect</div>
+                <div class="creator-dept">
+                    <i class="fas fa-laptop-code"></i>
+                    <span>Department of Computer Science & Engineering (CSE)</span>
+                </div>
+                <div style="color: var(--secondary-light); font-weight: 700; font-size: 0.95rem;">
+                    United International University (UIU)
+                </div>
+                <div class="creator-quote" data-en="&ldquo;Technology reaches its highest purpose when it directly feeds a hungry person and empowers an empathetic community.&rdquo;" data-bn="&ldquo;প্রযুক্তির আসল স্বার্থকতা তখনই যখন তা একজন ক্ষুধার্তের মুখে খাবার তুলে দিতে পারে এবং সমাজকে মানবিক করে তোলে।&rdquo;">
+                    &ldquo;Technology reaches its highest purpose when it directly feeds a hungry person and empowers an empathetic community.&rdquo;
+                </div>
+            </div>
+
+            <!-- Nafisa Tasnim Sohel -->
+            <div class="creator-profile-card">
+                <div class="creator-avatar-wrap" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);">
+                    NT
+                </div>
+                <h3 class="creator-name">Nafisa Tasnim Sohel</h3>
+                <div class="creator-role" data-en="Lead Designer & Full-Stack Developer" data-bn="প্রধান ডিজাইনার ও ফুল-স্ট্যাক ডেভেলপার">Lead Designer & Full-Stack Developer</div>
+                <div class="creator-dept">
+                    <i class="fas fa-paint-brush" style="color: var(--primary-light);"></i>
+                    <span>Department of Computer Science & Engineering (CSE)</span>
+                </div>
+                <div style="color: var(--primary-light); font-weight: 700; font-size: 0.95rem;">
+                    United International University (UIU)
+                </div>
+                <div class="creator-quote" style="border-left-color: var(--primary-light);" data-en="&ldquo;Designing intuitive, accessible platforms ensures that receiving help remains a dignified and heartwarming experience for all.&rdquo;" data-bn="&ldquo;সহজ ও আকর্ষণীয় ইন্টারফেসের মাধ্যমে সাহায্য গ্রহণ যেন প্রতিটি মানুষের কাছে একটি মর্যাদাপূর্ণ ও সুন্দর অভিজ্ঞতা হয়ে ওঠে।&rdquo;">
+                    &ldquo;Designing intuitive, accessible platforms ensures that receiving help remains a dignified and heartwarming experience for all.&rdquo;
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <span class="section-subtitle" data-en="Core Pillars" data-bn="মূল স্তম্ভ">Core Pillars</span>
+            <h2 class="section-title" data-en="Zero Waste. Zero Hunger." data-bn="অপচয়মুক্ত বাংলাদেশ, ক্ষুধামুক্ত ভবিষ্যৎ">Zero Waste. Zero Hunger.</h2>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-map-marked-alt"></i></div>
+                <h3 class="feature-title" data-en="Location-Based Discovery" data-bn="এলাকাভিত্তিক খাদ্য অনুসন্ধান">Location-Based Discovery</h3>
+                <p class="feature-desc" data-en="Find nearby food and cloth donations across Dhanmondi, Gulshan, Mirpur, Uttara, Badda, and UIU Campus in real time." data-bn="ধানমন্ডি, গুলশান, মিরপুর, উত্তরা, বাড্ডা এবং ইউআইইউ ক্যাম্পাসসহ সব এলাকার উদ্বৃত্ত খাবার ও পোশাক সহজে খুঁজুন।">
+                    Find nearby food and cloth donations across Dhanmondi, Gulshan, Mirpur, Uttara, Badda, and UIU Campus in real time.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                <h3 class="feature-title" data-en="Real-Time Notifications" data-bn="তাৎক্ষণিক নোটিফিকেশন">Real-Time Notifications</h3>
+                <p class="feature-desc" data-en="Live alerts across all pages ensure no fresh meal goes to waste. Donors and receivers coordinate instantly." data-bn="লাইভ নোটিফিকেশন সকল পেজে স্বয়ংক্রিয়ভাবে ভেসে ওঠে, যেন কোনো খাবার নষ্ট না হয়ে তাৎক্ষণিক বণ্টন হয়।">
+                    Live alerts across all pages ensure no fresh meal goes to waste. Donors and receivers coordinate instantly.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-medal"></i></div>
+                <h3 class="feature-title" data-en="Gamified Karma Points" data-bn="পয়েন্ট ও লিডারবোর্ড">Gamified Karma Points</h3>
+                <p class="feature-desc" data-en="Earn 10 points for standard food, +5 bonus for Ramadan/Qurbani, and 30 bonus points for blankets and dresses." data-bn="সাধারণ খাবারে ১০ পয়েন্ট, রমজান ও কোরবানিতে +৫ বোনাস এবং কম্বল-পোশাকে ৩০ পয়েন্ট অর্জন করে সেরা দাতার খেতাব পান।">
+                    Earn 10 points for standard food, +5 bonus for Ramadan/Qurbani, and 30 bonus points for blankets and dresses.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-box">
+            <h2 class="section-title" style="font-size: 2.8rem; margin-bottom: 16px;" data-en="Ready to Fight Hunger Together?" data-bn="ক্ষুধার বিরুদ্ধে এক হতে প্রস্তুত?">
+                Ready to Fight Hunger Together?
+            </h2>
+            <p style="color: var(--text-muted); font-size: 1.15rem; max-width: 600px; margin: 0 auto 36px;" data-en="Whether you have surplus cooked food, Iftar boxes, Qurbani meat, or winter clothes, someone nearby is waiting for your kindness." data-bn="উদ্বৃত্ত খাবার, রমজানের ইফতার, কোরবানির মাংস কিংবা শীতের পোশাক—আপনার একটু সহযোগিতায় ফুটে উঠতে পারে অসহায় মানুষের হাসি।">
+                Whether you have surplus cooked food, Iftar boxes, Qurbani meat, or winter clothes, someone nearby is waiting for your kindness.
+            </p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                <a th:href="@{/food/donate}" class="btn btn-warm" data-en="Start Donating Now" data-bn="এখনই দান করুন">Start Donating Now</a>
+                <a th:href="@{/food/receive-page}" class="btn btn-secondary" data-en="Find Food Nearby" data-bn="নিকটস্থ খাবার খুঁজুন">Find Food Nearby</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div>
+                <div class="footer-logo">
+                    <i class="fas fa-hands-helping" style="color: var(--secondary);"></i>
+                    MUKTI APP
+                </div>
+                <p class="footer-desc" data-en="Pioneering hunger eradication and surplus food preservation through community solidarity." data-bn="কমিউনিটি খাদ্য বিতরণ ও অপচয় নিরোধের মাধ্যমে ক্ষুধামুক্ত বাংলাদেশ গড়ে তোলার ডিজিটাল প্ল্যাটফর্ম।">
+                    Pioneering hunger eradication and surplus food preservation through community solidarity.
+                </p>
+                <div style="margin-top: 16px;">
+                    <span class="uiu-tag" style="font-size: 0.85rem; padding: 6px 14px;">
+                        <i class="fas fa-university"></i>
+                        UNITED INTERNATIONAL UNIVERSITY (UIU)
+                    </span>
+                </div>
+            </div>
+
+            <div>
+                <h4 style="color: white; margin-bottom: 20px;" data-en="Quick Links" data-bn="প্রয়োজনীয় লিংক">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/}" data-en="Home" data-bn="নীড়পাতা">Home</a></li>
+                    <li><a th:href="@{/food/donate}" data-en="Donate" data-bn="দান করুন">Donate</a></li>
+                    <li><a th:href="@{/food/receive-page}" data-en="Receive Food" data-bn="খাবার গ্রহণ">Receive Food</a></li>
+                    <li><a th:href="@{/food/leaderboard}" data-en="Leaderboard" data-bn="সেরা দাতা">Leaderboard</a></li>
+                    <li><a th:href="@{/login}" data-en="Login" data-bn="লগইন">Login</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 style="color: white; margin-bottom: 20px;" data-en="Creators & Contact" data-bn="উদ্যোক্তা ও যোগাযোগ">Creators & Contact</h4>
+                <ul class="footer-links" style="color: var(--text-muted); font-size: 0.95rem;">
+                    <li><i class="fas fa-user" style="margin-right: 8px; color: var(--secondary);"></i> Shamsil Arefin</li>
+                    <li><i class="fas fa-user" style="margin-right: 8px; color: var(--primary-light);"></i> Nafisa Tasnim Sohel</li>
+                    <li><i class="fas fa-graduation-cap" style="margin-right: 8px; color: #fca5a5;"></i> CSE, United International University</li>
+                    <li><i class="fas fa-envelope" style="margin-right: 8px;"></i> support@mukti.app</li>
+                    <li><i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i> Madani Avenue, Dhaka, Bangladesh</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>
+                &copy; 2026 MUKTI APP. Created by <strong>Shamsil Arefin & Nafisa Tasnim Sohel</strong>, CSE, United International University.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Global JavaScript with bilingual and live notifications engine -->
+    <script th:src="@{/js/global.js}"></script>
+    <script>
+        // Navbar scroll behavior
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Home Page Food Search & Area Filtering
+        let homeActiveArea = 'ALL';
+
+        function filterHomeFood() {
+            const keyword = (document.getElementById('homeFoodSearch')?.value || '').toLowerCase().trim();
+            const cards = document.querySelectorAll('.home-food-card');
+
+            cards.forEach(card => {
+                const loc = (card.getAttribute('data-location') || '').toLowerCase();
+                const text = card.textContent.toLowerCase();
+
+                const matchesSearch = !keyword || text.includes(keyword) || loc.includes(keyword);
+                const matchesArea = homeActiveArea === 'ALL' || loc.includes(homeActiveArea.toLowerCase());
+
+                if (matchesSearch && matchesArea) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        const homeSearchInput = document.getElementById('homeFoodSearch');
+        if (homeSearchInput) {
+            homeSearchInput.addEventListener('input', filterHomeFood);
+        }
+
+        document.querySelectorAll('#homeAreaChips .home-chip-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('#homeAreaChips .home-chip-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                homeActiveArea = this.getAttribute('data-area');
+                filterHomeFood();
+            });
+        });
+
+        // Receive Handler for Home Page (Logged-in users)
+        window.receiveFoodHome = async function (id) {
+            const btn = document.getElementById('h-btn-' + id);
+            const text = document.getElementById('h-text-' + id);
+            const isBn = (localStorage.getItem('mukti_lang') || 'en') === 'bn';
+
+            const confirmMsg = isBn 
+                ? "আপনি কি এই খাবার/সামগ্রীটি গ্রহণ করতে চান? অনুগ্রহ করে দাতার সাথে যোগাযোগ করে সংগ্রহ নিশ্চিত করুন।"
+                : "Do you want to request this donation? Please make sure you can coordinate pickup with the donor.";
+
+            if (confirm(confirmMsg)) {
+                if (btn) btn.disabled = true;
+                if (text) text.innerText = isBn ? 'প্রক্রিয়াধীন...' : 'Processing...';
+                try {
+                    const response = await fetch('/food/receive/' + id, { method: 'POST' });
+                    if (response.status === 401) {
+                        alert(isBn ? "খাবার গ্রহণ করতে অনুগ্রহ করে প্রথমে লগইন করুন।" : "Please login first to receive food.");
+                        window.location.href = '/login';
+                        return;
+                    }
+                    if (response.ok) {
+                        if (btn) btn.style.background = "#10B981";
+                        if (text) text.innerText = isBn ? 'সফল হয়েছে!' : 'Success!';
+                        alert(isBn 
+                            ? "সফল হয়েছে! অনুদানটি আপনার জন্য বরাদ্দ হয়েছে। পিকআপের জন্য অনুগ্রহ করে দাতাকে ফোন করুন।"
+                            : "Success! The donation has been assigned to you. Please call the donor to coordinate collection.");
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        alert(isBn ? "কোনো সমস্যা হয়েছে বা খাবারটি ইতিমধ্যে গ্রহণ করা হয়েছে।" : "Something went wrong or item is already taken.");
+                        if (btn) btn.disabled = false;
+                        if (text) text.innerText = isBn ? "গ্রহণ করুন" : "Receive";
+                    }
+                } catch (e) {
+                    alert(isBn ? "কানেকশন এরর।" : "Connection error.");
+                    if (btn) btn.disabled = false;
+                    if (text) text.innerText = isBn ? "গ্রহণ করুন" : "Receive";
+                }
+            }
+        };
+    </script>
+</body>
+
+</html>

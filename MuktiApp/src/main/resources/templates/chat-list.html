@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages | MUKTI APP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <meta name="user-phone" th:content="${session.user != null ? session.user.phone : ''}">
+    <link th:href="@{/css/global.css}" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-light: #34D399;
+            --primary-dark: #059669;
+            --secondary: #F59E0B;
+            --accent: #F97316;
+            --danger: #EF4444;
+            --dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(20px);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --radius-xl: 32px;
+            --radius-lg: 20px;
+            --radius-pill: 50px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', 'Inter', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at bottom right, #24160e, #120e0a);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 28px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            gap: 16px;
+        }
+
+        .chat-header h1 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .chat-header h1 i {
+            color: var(--primary-light);
+        }
+
+        .header-nav-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            text-decoration: none;
+            padding: 9px 20px;
+            border-radius: var(--radius-pill);
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.25s ease;
+            border: 1px solid var(--glass-border);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.danger-btn {
+            background: rgba(239, 68, 68, 0.12);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .nav-btn.danger-btn:hover {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: #ef4444;
+        }
+
+        .chat-section {
+            padding: 28px 36px;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .conv-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .conv-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 22px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .conv-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: translateY(-2px);
+        }
+
+        .conv-item.is-completed {
+            opacity: 0.82;
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .conv-item.is-blocked {
+            border-color: rgba(239, 68, 68, 0.25);
+            background: rgba(239, 68, 68, 0.02);
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin-right: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .avatar.receiver {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .name-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+
+        .food-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .role-tag {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-donor {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--primary-light);
+        }
+
+        .tag-receiver {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--secondary);
+        }
+
+        /* Status Badges */
+        .conv-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .conv-badge.badge-completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .conv-badge.badge-blocked-them {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .conv-badge.badge-blocked-me {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .food-name {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .last-msg {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .right-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 14px;
+            flex-shrink: 0;
+        }
+
+        .unread-badge {
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-block-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: #cbd5e1;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .quick-block-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.4);
+            transform: scale(1.1);
+        }
+
+        .quick-block-btn.is-blocked {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .quick-block-btn.is-blocked:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: var(--radius-lg);
+            border: 1px dashed var(--glass-border);
+        }
+
+        /* Blocked Users Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #191410;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 28px 32px;
+            width: 100%;
+            max-width: 540px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .block-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .block-input-row input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-pill);
+            padding: 10px 18px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .block-input-row input:focus {
+            border-color: #ef4444;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-modal-block {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: var(--radius-pill);
+            padding: 10px 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-modal-block:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .blocked-list-scroll {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .blocked-user-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+        }
+
+        .blocked-user-info strong {
+            display: block;
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        .blocked-user-info span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .btn-unblock-pill {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: var(--radius-pill);
+            padding: 5px 14px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-unblock-pill:hover {
+            background: #10b981;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container glass-panel fade-in">
+        <header class="chat-header">
+            <h1>
+                <i class="fas fa-comment-dots"></i>
+                <span data-en="Messages & Conversations" data-bn="মেসেজ ও বার্তালাপ">Messages & Conversations</span>
+            </h1>
+            <div class="header-nav-group">
+                <button type="button" class="nav-btn danger-btn" onclick="openBlockedModal()" title="View and manage blocked users">
+                    <i class="fas fa-user-slash"></i>
+                    <span data-en="Blocked Users" data-bn="ব্লক তালিকা">Blocked Users</span>
+                </button>
+                <a href="/dashboard" class="nav-btn">
+                    <i class="fas fa-th-large"></i>
+                    <span data-en="Dashboard" data-bn="ড্যাশবোর্ড">Dashboard</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Donating Section -->
+        <div class="chat-section">
+            <h2 class="section-title">
+                <i class="fas fa-hand-holding-heart" style="color: var(--primary-light);"></i>
+                <span data-en="My Food & Accessories Donations" data-bn="আমার দানকৃত খাবার ও সামগ্রী">My Food & Accessories Donations</span>
+            </h2>
+            <div class="conv-list">
+                <div th:if="${donations == null or donations.isEmpty()}" class="empty-state"
+                    data-en="No active donation chats yet" data-bn="এখনও কোনো সক্রিয় ডোনেশন চ্যাট নেই">
+                    No active donation chats yet
+                </div>
+
+                <a th:each="conv : ${donations}"
+                    th:href="@{'/chat/room/' + ${conv.foodPostId} + '?otherPhone=' + ${conv.otherUserPhone} + ${conv.isRequest == true ? '&isRequest=true' : ''}}"
+                    class="conv-item"
+                    th:classappend="${conv.isCompleted} ? ' is-completed' : (${conv.isBlockedByMe || conv.isBlockedByThem} ? ' is-blocked' : '')">
+                    <div class="avatar"
+                        th:text="${conv.otherUserName != null && !conv.otherUserName.isEmpty() ? conv.otherUserName.substring(0, 1).toUpperCase() : 'U'}">
+                        U</div>
+                    <div class="details">
+                        <div class="top-row">
+                            <div class="name-group">
+                                <span class="name" th:text="${conv.otherUserName}">User</span>
+                                <!-- Status Badges -->
+                                <span th:if="${conv.isCompleted}" class="conv-badge badge-completed">
+                                    <i class="fas fa-check-circle"></i> <span data-en="Completed" data-bn="সম্পন্ন">Completed</span>
+                                </span>
+                                <span th:if="${conv.isBlockedByThem}" class="conv-badge badge-blocked-them">
+                                    <i class="fas fa-ban"></i> <span data-en="Blocked" data-bn="ব্লকড">Blocked</span>
+                                </span>
+                                <span th:if="${conv.isBlockedByMe}" class="conv-badge badge-blocked-me">
+                                    <i class="fas fa-user-slash"></i> <span data-en="You Blocked" data-bn="আপনি ব্লক করেছেন">You Blocked</span>
+                                </span>
+                            </div>
+                            <span class="time" th:text="${#temporals.format(conv.lastMessageTime, 'HH:mm')}">Time</span>
+                        </div>
+                        <div class="food-info">
+                            <span class="role-tag tag-donor">DONOR</span>
+                            <span class="food-name" th:text="${conv.foodName}">Food Name</span>
+                        </div>
+                        <div class="last-msg" th:text="${conv.lastMessage}">Last message...</div>
+                    </div>
+                    <div class="right-actions">
+                        <div th:if="${conv.unreadCount > 0}" class="unread-badge" th:text="${conv.unreadCount}">1</div>
+                        <button type="button" class="quick-block-btn"
+                            th:classappend="${conv.isBlockedByMe} ? 'is-blocked' : ''"
+                            th:attr="data-phone=${conv.otherUserPhone}, data-blocked=${conv.isBlockedByMe}"
+                            onclick="handleQuickBlock(event, this)"
+                            th:title="${conv.isBlockedByMe ? 'Unblock User' : 'Block User'}">
+                            <i th:class="${conv.isBlockedByMe} ? 'fas fa-unlock' : 'fas fa-ban'"></i>
+                        </button>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Receiving Section -->
+        <div class="chat-section" style="border-top: 1px solid var(--glass-border);">
+            <h2 class="section-title">
+                <i class="fas fa-box-open" style="color: var(--secondary);"></i>
+                <span data-en="Received Items & Assistance Chats" data-bn="গৃহীত সামগ্রী ও সহায়তার চ্যাট">Received Items & Assistance Chats</span>
+            </h2>
+            <div class="conv-list">
+                <div th:if="${receivals == null or receivals.isEmpty()}" class="empty-state"
+                    data-en="No active receive chats yet" data-bn="এখনও কোনো সক্রিয় রিসিভ চ্যাট নেই">
+                    No active receive chats yet
+                </div>
+
+                <a th:each="conv : ${receivals}"
+                    th:href="@{'/chat/room/' + ${conv.foodPostId} + '?otherPhone=' + ${conv.otherUserPhone} + ${conv.isRequest == true ? '&isRequest=true' : ''}}"
+                    class="conv-item"
+                    th:classappend="${conv.isCompleted} ? ' is-completed' : (${conv.isBlockedByMe || conv.isBlockedByThem} ? ' is-blocked' : '')">
+                    <div class="avatar receiver"
+                        th:text="${conv.otherUserName != null && !conv.otherUserName.isEmpty() ? conv.otherUserName.substring(0, 1).toUpperCase() : 'U'}">
+                        U</div>
+                    <div class="details">
+                        <div class="top-row">
+                            <div class="name-group">
+                                <span class="name" th:text="${conv.otherUserName}">User</span>
+                                <!-- Status Badges -->
+                                <span th:if="${conv.isCompleted}" class="conv-badge badge-completed">
+                                    <i class="fas fa-check-circle"></i> <span data-en="Completed" data-bn="সম্পন্ন">Completed</span>
+                                </span>
+                                <span th:if="${conv.isBlockedByThem}" class="conv-badge badge-blocked-them">
+                                    <i class="fas fa-ban"></i> <span data-en="Blocked" data-bn="ব্লকড">Blocked</span>
+                                </span>
+                                <span th:if="${conv.isBlockedByMe}" class="conv-badge badge-blocked-me">
+                                    <i class="fas fa-user-slash"></i> <span data-en="You Blocked" data-bn="আপনি ব্লক করেছেন">You Blocked</span>
+                                </span>
+                            </div>
+                            <span class="time" th:text="${#temporals.format(conv.lastMessageTime, 'HH:mm')}">Time</span>
+                        </div>
+                        <div class="food-info">
+                            <span class="role-tag tag-receiver">RECEIVER</span>
+                            <span class="food-name" th:text="${conv.foodName}">Food Name</span>
+                        </div>
+                        <div class="last-msg" th:text="${conv.lastMessage}">Last message...</div>
+                    </div>
+                    <div class="right-actions">
+                        <div th:if="${conv.unreadCount > 0}" class="unread-badge" th:text="${conv.unreadCount}">1</div>
+                        <button type="button" class="quick-block-btn"
+                            th:classappend="${conv.isBlockedByMe} ? 'is-blocked' : ''"
+                            th:attr="data-phone=${conv.otherUserPhone}, data-blocked=${conv.isBlockedByMe}"
+                            onclick="handleQuickBlock(event, this)"
+                            th:title="${conv.isBlockedByMe ? 'Unblock User' : 'Block User'}">
+                            <i th:class="${conv.isBlockedByMe} ? 'fas fa-unlock' : 'fas fa-ban'"></i>
+                        </button>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blocked Users Modal -->
+    <div class="modal-overlay" id="blockedModal" onclick="if(event.target === this) closeBlockedModal()">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-user-slash" style="color: #ef4444;"></i>
+                    <span data-en="Manage Blocked Users" data-bn="ব্লক করা ব্যক্তিদের তালিকা">Manage Blocked Users</span>
+                </h3>
+                <button type="button" class="modal-close" onclick="closeBlockedModal()">&times;</button>
+            </div>
+
+            <!-- Block Any User by Phone -->
+            <div class="block-input-row">
+                <input type="text" id="manualBlockPhone" placeholder="Enter phone number (e.g. 017xxxxxxxx)"
+                    data-en="Enter phone number (e.g. 017xxxxxxxx)" data-bn="মোবাইল নম্বর লিখুন (যেমন: ০১৭xxxxxxxx)">
+                <button type="button" class="btn-modal-block" onclick="blockUserByInput()">
+                    <i class="fas fa-ban"></i> <span data-en="Block" data-bn="ব্লক করুন">Block</span>
+                </button>
+            </div>
+
+            <!-- List of Blocked Users -->
+            <div class="blocked-list-scroll" id="blockedListContainer">
+                <div style="text-align: center; color: var(--text-muted); padding: 20px;"
+                    data-en="Loading blocked users..." data-bn="লোড হচ্ছে...">Loading blocked users...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function handleQuickBlock(e, btn) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const phone = btn.getAttribute('data-phone');
+            const isBlocked = btn.getAttribute('data-blocked') === 'true';
+            const action = isBlocked ? 'unblock' : 'block';
+            const currentLang = localStorage.getItem('mukti_lang') || 'en';
+
+            const confirmMsg = !isBlocked
+                ? (currentLang === 'bn' ? `আপনি কি ${phone} নম্বর ব্যবহারকারীকে ব্লক করতে চান?` : `Do you want to block ${phone}? They won't be able to message you.`)
+                : (currentLang === 'bn' ? `আপনি কি ${phone} নম্বর ব্যবহারকারীকে আনব্লক করতে চান?` : `Do you want to unblock ${phone}?`);
+
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const res = await fetch(`/chat/${action}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ targetPhone: phone })
+                });
+
+                if (res.ok) {
+                    window.location.reload();
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    alert(err.error || 'Failed to update block status');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Connection error');
+            }
+        }
+
+        function openBlockedModal() {
+            document.getElementById('blockedModal').classList.add('active');
+            loadBlockedUsersList();
+        }
+
+        function closeBlockedModal() {
+            document.getElementById('blockedModal').classList.remove('active');
+        }
+
+        async function loadBlockedUsersList() {
+            const container = document.getElementById('blockedListContainer');
+            const currentLang = localStorage.getItem('mukti_lang') || 'en';
+            try {
+                const res = await fetch('/chat/blocked-users');
+                if (res.ok) {
+                    const list = await res.json();
+                    if (!list || list.length === 0) {
+                        container.innerHTML = `<div style="text-align:center; padding: 24px; color: var(--text-muted);">${currentLang === 'bn' ? 'কোনো ব্লক করা ব্যবহারকারী নেই।' : 'No blocked users.'}</div>`;
+                        return;
+                    }
+
+                    container.innerHTML = list.map(item => `
+                        <div class="blocked-user-card">
+                            <div class="blocked-user-info">
+                                <strong>${escapeHTML(item.blockedName)}</strong>
+                                <span>${escapeHTML(item.blockedPhone)}</span>
+                            </div>
+                            <button type="button" class="btn-unblock-pill" onclick="unblockFromModal('${item.blockedPhone}')">
+                                <i class="fas fa-unlock"></i> ${currentLang === 'bn' ? 'আনব্লক' : 'Unblock'}
+                            </button>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `<div style="text-align:center; padding: 20px; color: #f87171;">Failed to load.</div>`;
+                }
+            } catch (err) {
+                container.innerHTML = `<div style="text-align:center; padding: 20px; color: #f87171;">Connection error.</div>`;
+            }
+        }
+
+        async function blockUserByInput() {
+            const input = document.getElementById('manualBlockPhone');
+            const phone = input.value.trim();
+            const currentLang = localStorage.getItem('mukti_lang') || 'en';
+
+            if (!phone) {
+                alert(currentLang === 'bn' ? 'অনুগ্রহ করে মোবাইল নম্বর লিখুন।' : 'Please enter a phone number.');
+                return;
+            }
+
+            try {
+                const res = await fetch('/chat/block', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ targetPhone: phone })
+                });
+
+                if (res.ok) {
+                    input.value = '';
+                    loadBlockedUsersList();
+                    // Reload background chat list after 1s
+                    setTimeout(() => window.location.reload(), 1200);
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    alert(err.error || 'Failed to block user');
+                }
+            } catch (err) {
+                alert('Connection error');
+            }
+        }
+
+        async function unblockFromModal(phone) {
+            const currentLang = localStorage.getItem('mukti_lang') || 'en';
+            if (!confirm(currentLang === 'bn' ? `আপনি কি ${phone} কে আনব্লক করতে চান?` : `Unblock ${phone}?`)) return;
+
+            try {
+                const res = await fetch('/chat/unblock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ targetPhone: phone })
+                });
+
+                if (res.ok) {
+                    loadBlockedUsersList();
+                    setTimeout(() => window.location.reload(), 1200);
+                } else {
+                    alert('Failed to unblock');
+                }
+            } catch (err) {
+                alert('Connection error');
+            }
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+        }
+    </script>
+    <script th:src="@{/js/global.js}"></script>
+</body>
+
+</html>

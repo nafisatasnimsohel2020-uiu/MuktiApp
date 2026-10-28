@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | MUKTI APP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link th:href="@{/css/global.css}" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-light: #34D399;
+            --primary-dark: #059669;
+            --secondary: #F59E0B;
+            --accent: #F97316;
+            --dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(20px);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --radius-xl: 32px;
+            --radius-lg: 20px;
+            --radius-pill: 50px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', 'Inter', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top left, #24160e, #120e0a);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            padding: 20px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 450px;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 40px 42px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.8s ease;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Top Navigation Header inside Card */
+        .login-top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .back-home-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius-pill);
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+        }
+
+        .back-home-pill:hover {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--primary-light);
+            color: #ffffff;
+            transform: translateX(-3px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .back-home-pill i {
+            color: var(--primary-light);
+            font-size: 0.85rem;
+            transition: transform 0.2s;
+        }
+
+        .back-home-pill:hover i {
+            transform: translateX(-2px);
+        }
+
+        .login-lang-box {
+            display: flex;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 3px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .login-lang-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 4px 10px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .login-lang-btn.active,
+        .login-lang-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff 0%, #10B981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-light);
+            font-size: 1.1rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px 20px 16px 52px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-pill);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-light);
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            font-size: 0.9rem;
+        }
+
+        .forgot {
+            color: var(--primary-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .forgot:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 17px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.25);
+            margin-bottom: 20px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.35);
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        /* Divider & Return to Home Button */
+        .login-home-divider {
+            position: relative;
+            text-align: center;
+            margin: 22px 0 16px;
+        }
+
+        .login-home-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .login-home-divider span {
+            position: relative;
+            background: #18110b;
+            padding: 0 14px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+        }
+
+        .btn-return-home {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 13px 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius-pill);
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-return-home:hover {
+            background: rgba(16, 185, 129, 0.14);
+            border-color: rgba(16, 185, 129, 0.4);
+            color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-return-home i {
+            color: var(--primary-light);
+            font-size: 1rem;
+        }
+
+        .alert {
+            padding: 14px 16px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 22px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary-light);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <script th:src="@{/js/global.js}"></script>
+    <div class="login-card">
+        <!-- Top Navigation Bar: Back to Home + Language Toggle -->
+        <div class="login-top-nav">
+            <a th:href="@{/}" class="back-home-pill" title="Back to Homepage / হোম পেজে ফিরে যান">
+                <i class="fas fa-arrow-left"></i>
+                <span data-en="Back to Home" data-bn="হোম পেজে ফিরুন">Back to Home</span>
+            </a>
+            <div class="login-lang-box">
+                <button type="button" class="login-lang-btn" onclick="switchLoginLang('en')" id="lang-btn-en">EN</button>
+                <button type="button" class="login-lang-btn" onclick="switchLoginLang('bn')" id="lang-btn-bn">বাংলা</button>
+            </div>
+        </div>
+
+        <header class="header">
+            <h1 data-en="MUKTI APP" data-bn="মুক্তি অ্যাপ">MUKTI APP</h1>
+            <p data-en="Welcome back! Please login." data-bn="স্বাগতম! অনুগ্রহ করে লগইন করুন।">Welcome back! Please login.</p>
+        </header>
+
+        <div th:if="${error}" class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}">Error message</span>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${success}">Success message</span>
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label class="form-label" data-en="Phone or Email" data-bn="ফোন অথবা ইমেইল">Phone or Email</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="identifier" class="input-field" placeholder="Enter phone or email"
+                        data-placeholder-en="Enter phone or email" data-placeholder-bn="ফোন অথবা ইমেইল লিখুন" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" data-en="Password" data-bn="পাসওয়ার্ড">Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" class="input-field" placeholder="Enter password"
+                        data-placeholder-en="Enter password" data-placeholder-bn="পাসওয়ার্ড লিখুন" required>
+                </div>
+            </div>
+
+            <div class="options">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" name="remember">
+                    <span data-en="Remember me" data-bn="আমাকে মনে রাখুন">Remember me</span>
+                </label>
+                <a th:href="@{/forgot}" class="forgot" data-en="Forgot Password?" data-bn="পাসওয়ার্ড ভুলে গেছেন?">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="login-btn" data-en="Login" data-bn="লগইন করুন">Login</button>
+        </form>
+
+        <div class="footer">
+            <p><span data-en="New here?" data-bn="নতুন ব্যবহারকারী?">New here?</span> <a th:href="@{/register}" data-en="Create Account" data-bn="নতুন অ্যাকাউন্ট খুলুন">Create Account</a></p>
+        </div>
+
+        <!-- Go to Homepage Button -->
+        <div class="login-home-divider">
+            <span data-en="or" data-bn="অথবা">or</span>
+        </div>
+
+        <a th:href="@{/}" class="btn-return-home" title="Go to Home Page / হোম পেজে যান">
+            <i class="fas fa-home"></i>
+            <span data-en="Go to Home Page" data-bn="হোম পেজে ফিরে যান">Go to Home Page</span>
+        </a>
+    </div>
+
+    <script>
+        // Language switch helper
+        function switchLoginLang(lang) {
+            if (typeof window.setMuktiLanguage === 'function') {
+                window.setMuktiLanguage(lang);
+            } else {
+                localStorage.setItem('mukti_lang', lang);
+                location.reload();
+            }
+            updateLangButtons(lang);
+        }
+
+        function updateLangButtons(lang) {
+            const currentLang = lang || localStorage.getItem('mukti_lang') || 'en';
+            const enBtn = document.getElementById('lang-btn-en');
+            const bnBtn = document.getElementById('lang-btn-bn');
+            if (enBtn && bnBtn) {
+                if (currentLang === 'bn') {
+                    bnBtn.classList.add('active');
+                    enBtn.classList.remove('active');
+                } else {
+                    enBtn.classList.add('active');
+                    bnBtn.classList.remove('active');
+                }
+            }
+        }
+
+        // Ripple Effect
+        function addRippleEffect() {
+            const buttons = document.querySelectorAll('.login-btn, .btn-return-home');
+            buttons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    const x = e.clientX - e.target.offsetLeft;
+                    const y = e.clientY - e.target.offsetTop;
+                    const ripple = document.createElement('span');
+                    ripple.className = 'ripple';
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+        }
+
+        // Initialize UI effects
+        document.addEventListener('DOMContentLoaded', function () {
+            updateLangButtons();
+
+            // Ripple animation style
+            const style = document.createElement('style');
+            style.textContent = `
+                .login-btn, .btn-return-home { position: relative; overflow: hidden; }
+                .ripple {
+                    position: absolute;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%);
+                    pointer-events: none;
+                    animation: ripple 0.6s linear;
+                }
+                @keyframes ripple {
+                    from { width: 0; height: 0; opacity: 0.5; }
+                    to { width: 400px; height: 400px; opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            addRippleEffect();
+
+            // Subtle card animation on mouse move
+            const card = document.querySelector('.login-card');
+            document.addEventListener('mousemove', function (e) {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 80;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 80;
+                card.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+
+            document.addEventListener('mouseleave', function () {
+                card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+            });
+        });
+    </script>
+</body>
+
+</html>

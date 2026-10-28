@@ -1,0 +1,356 @@
+/* ==========================================================================
+   MUKTI APP - GLOBAL STYLESHEET
+   Zero Hunger & Community Food Sharing Platform
+   Theme: Warm Culinary Hunger Relief (Amber, Emerald, Terracotta & Gold)
+   Created by: Shamsil Arefin & Nafisa Tasnim Sohel | CSE UIU
+   ========================================================================== */
+
+:root {
+    --primary: #10B981;
+    --primary-light: #34D399;
+    --primary-dark: #059669;
+    --secondary: #F59E0B;
+    --secondary-light: #FCD34D;
+    --accent: #F97316;
+    --warm-ember: #EA580C;
+    --ramadan-gold: #FBBF24;
+    --qurbani-rose: #E11D48;
+    --blanket-blue: #38BDF8;
+    --blanket-purple: #818CF8;
+    --dark: #0f172a;
+    --dark-warm: #120e0a;
+    --dark-warm-surface: #1a130d;
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: blur(24px);
+    --text-main: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.65);
+    --text-sub: rgba(255, 255, 255, 0.45);
+    --radius-xl: 28px;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-pill: 9999px;
+    --font-en: 'Outfit', 'Inter', system-ui, sans-serif;
+    --font-bn: 'Hind Siliguri', 'Noto Serif Bengali', 'Baloo Da 2', sans-serif;
+}
+
+body[data-lang="bn"] {
+    font-family: var(--font-bn) !important;
+}
+
+/* Mouse Glow Effect */
+.mouse-glow {
+    position: fixed;
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(16, 185, 129, 0.05) 45%, transparent 75%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    will-change: left, top;
+    transition: opacity 0.3s ease;
+}
+
+body {
+    overflow-x: hidden;
+    background-color: var(--dark-warm);
+    color: var(--text-main);
+}
+
+/* ==========================================================================
+   GLOBAL NOTIFICATION TOAST CONTAINER (SHOWN ON ALL PAGES)
+   ========================================================================== */
+#mukti-notification-container,
+.notification-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 380px;
+    width: calc(100% - 48px);
+    pointer-events: none;
+}
+
+.mukti-toast,
+.notification-toast {
+    pointer-events: auto;
+    background: rgba(18, 14, 10, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    color: white;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(245, 158, 11, 0.1);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.mukti-toast::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary);
+}
+
+.mukti-toast.donation::before { background: var(--secondary); }
+.mukti-toast.points::before { background: var(--ramadan-gold); }
+.mukti-toast.request::before { background: var(--accent); }
+.mukti-toast.message::before { background: #38bdf8; }
+.mukti-toast.login::before { background: var(--primary-light); }
+
+.mukti-toast:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
+    border-color: rgba(245, 158, 11, 0.4);
+}
+
+.toast-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--primary-light);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.mukti-toast.donation .toast-icon {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--secondary);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.mukti-toast.points .toast-icon {
+    background: rgba(251, 191, 36, 0.15);
+    color: var(--ramadan-gold);
+    border-color: rgba(251, 191, 36, 0.3);
+}
+
+.toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toast-message {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.toast-close {
+    background: transparent;
+    border: none;
+    color: var(--text-sub);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0 0 0 8px;
+    transition: color 0.2s;
+}
+
+.toast-close:hover {
+    color: white;
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(50px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes toastSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(50px) scale(0.95);
+    }
+}
+
+/* ==========================================================================
+   LANGUAGE SWITCHER WIDGET
+   ========================================================================== */
+.lang-switcher {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-pill);
+    padding: 3px;
+    gap: 2px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.lang-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.lang-btn:hover {
+    color: white;
+}
+
+.lang-btn.active {
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* ==========================================================================
+   CAMPAIGN BADGES & CARDS
+   ========================================================================== */
+.badge-campaign {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-ramadan {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--ramadan-gold);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.badge-qurbani {
+    background: rgba(225, 29, 72, 0.15);
+    color: #fb7185;
+    border: 1px solid rgba(225, 29, 72, 0.35);
+}
+
+.badge-blanket {
+    background: rgba(129, 140, 248, 0.18);
+    color: #c7d2fe;
+    border: 1px solid rgba(129, 140, 248, 0.35);
+}
+
+.points-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(234, 88, 12, 0.15));
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: var(--secondary-light);
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   CREATOR SHOWCASE SECTION (UIU CSE)
+   ========================================================================== */
+.creators-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(245, 158, 11, 0.04) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    backdrop-filter: blur(20px);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.creators-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(245, 158, 11, 0.35);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.uiu-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #fca5a5;
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   AREA SEARCH & FILTER CHIPS
+   ========================================================================== */
+.area-chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.area-chip {
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-pill);
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.area-chip:hover,
+.area-chip.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}

@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate Food & Warmth | MUKTI APP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link th:href="@{/css/global.css}" rel="stylesheet">
+    <meta name="user-phone" th:content="${session.user != null ? session.user.phone : ''}">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-light: #34D399;
+            --primary-dark: #059669;
+            --secondary: #F59E0B;
+            --secondary-light: #FCD34D;
+            --accent: #F97316;
+            --dark: #0f172a;
+            --dark-warm: #120e0a;
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: blur(20px);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --radius-xl: 32px;
+            --radius-lg: 20px;
+            --radius-pill: 50px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', 'Inter', 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #24160e, #120e0a);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            padding: 32px 40px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            border: 1px solid var(--glass-border);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(-4px);
+        }
+
+        .header-content h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .header-content p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 28px;
+        }
+
+        .info-panel {
+            padding: 32px;
+            height: fit-content;
+        }
+
+        .reward-preview-card {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .reward-pts-big {
+            font-size: 3.2rem;
+            font-weight: 900;
+            color: var(--secondary-light);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--secondary-light);
+        }
+
+        .tips-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .tips-list li {
+            display: flex;
+            gap: 14px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+        }
+
+        .tip-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .tip-content h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .tip-content p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .form-panel {
+            padding: 36px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Alada Dedicated Donation Carts */
+        .cart-switcher-header {
+            margin-bottom: 24px;
+        }
+
+        .cart-switcher-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--secondary-light);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-tabs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .cart-select-tab {
+            padding: 16px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            gap: 6px;
+        }
+
+        .cart-select-tab:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .cart-select-tab.active {
+            transform: translateY(-3px);
+        }
+
+        /* Ramadan Cart Tab */
+        .cart-select-tab.tab-ramadan {
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+        .cart-select-tab.tab-ramadan.active {
+            border-color: #fbbf24;
+            background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.25), rgba(16, 185, 129, 0.12), rgba(20, 15, 10, 0.95));
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.35);
+        }
+
+        /* Qurbani Cart Tab */
+        .cart-select-tab.tab-qurbani {
+            border-color: rgba(225, 29, 72, 0.35);
+        }
+        .cart-select-tab.tab-qurbani.active {
+            border-color: #fb7185;
+            background: radial-gradient(circle at top right, rgba(225, 29, 72, 0.25), rgba(20, 10, 12, 0.95));
+            box-shadow: 0 8px 25px rgba(225, 29, 72, 0.35);
+        }
+
+        /* Blanket Cart Tab */
+        .cart-select-tab.tab-blanket {
+            border-color: rgba(139, 92, 246, 0.35);
+        }
+        .cart-select-tab.tab-blanket.active {
+            border-color: #c4b5fd;
+            background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.25), rgba(15, 10, 25, 0.95));
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.35);
+        }
+
+        /* Regular Cart Tab */
+        .cart-select-tab.tab-regular {
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+        .cart-select-tab.tab-regular.active {
+            border-color: #34d399;
+            background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.2), rgba(10, 20, 15, 0.95));
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .cart-tab-icon {
+            font-size: 1.5rem;
+            margin-bottom: 2px;
+        }
+
+        .cart-select-tab.tab-ramadan .cart-tab-icon { color: #fbbf24; }
+        .cart-select-tab.tab-qurbani .cart-tab-icon { color: #fb7185; }
+        .cart-select-tab.tab-blanket .cart-tab-icon { color: #c4b5fd; }
+        .cart-select-tab.tab-regular .cart-tab-icon { color: #34d399; }
+
+        .cart-tab-name {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .cart-tab-pill {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            text-transform: uppercase;
+        }
+
+        .cart-select-tab.tab-ramadan .cart-tab-pill {
+            background: rgba(245, 158, 11, 0.25);
+            color: #fde68a;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .cart-select-tab.tab-qurbani .cart-tab-pill {
+            background: rgba(225, 29, 72, 0.25);
+            color: #fecdd3;
+            border: 1px solid rgba(225, 29, 72, 0.4);
+        }
+        .cart-select-tab.tab-blanket .cart-tab-pill {
+            background: rgba(139, 92, 246, 0.25);
+            color: #ddd6fe;
+            border: 1px solid rgba(139, 92, 246, 0.4);
+        }
+        .cart-select-tab.tab-regular .cart-tab-pill {
+            background: rgba(16, 185, 129, 0.2);
+            color: #a7f3d0;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+
+        .tab-active-check {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.6);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .cart-select-tab.active .tab-active-check {
+            opacity: 1;
+            transform: scale(1);
+            background: #10b981;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.8);
+        }
+
+        .quick-suggest-header {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--secondary-light);
+            margin: 10px 0 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .qty-presets-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .qty-preset-chip {
+            padding: 4px 11px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-pill);
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .qty-preset-chip:hover,
+        .qty-preset-chip.active {
+            background: var(--secondary);
+            color: #120e0a;
+            border-color: var(--secondary);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Dedicated Active Cart Hero / Banner inside Form Panel */
+        .active-cart-hero {
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .active-cart-hero.ramadan-theme {
+            background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.25), rgba(16, 185, 129, 0.12), rgba(20, 15, 10, 0.95));
+            border: 2px solid rgba(245, 158, 11, 0.55);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
+        }
+
+        .active-cart-hero.qurbani-theme {
+            background: radial-gradient(circle at top right, rgba(225, 29, 72, 0.25), rgba(20, 10, 12, 0.95));
+            border: 2px solid rgba(225, 29, 72, 0.55);
+            box-shadow: 0 10px 30px rgba(225, 29, 72, 0.2);
+        }
+
+        .active-cart-hero.blanket-theme {
+            background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.25), rgba(15, 10, 25, 0.95));
+            border: 2px solid rgba(139, 92, 246, 0.55);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+        }
+
+        .active-cart-hero.regular-theme {
+            background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.18), rgba(10, 20, 15, 0.95));
+            border: 2px solid rgba(16, 185, 129, 0.45);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15);
+        }
+
+        .cart-time-notice {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            border-radius: var(--radius-pill);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .ramadan-theme .cart-time-notice {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            color: #120e0a;
+            box-shadow: 0 3px 12px rgba(245, 158, 11, 0.4);
+        }
+        .qurbani-theme .cart-time-notice {
+            background: linear-gradient(90deg, #e11d48, #be123c);
+            color: white;
+            box-shadow: 0 3px 12px rgba(225, 29, 72, 0.4);
+        }
+        .blanket-theme .cart-time-notice {
+            background: linear-gradient(90deg, #8b5cf6, #6d28d9);
+            color: white;
+            box-shadow: 0 3px 12px rgba(139, 92, 246, 0.4);
+        }
+        .regular-theme .cart-time-notice {
+            background: linear-gradient(90deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 3px 12px rgba(16, 185, 129, 0.35);
+        }
+
+        .active-cart-title {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 6px;
+        }
+
+        .active-cart-desc {
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.5;
+        }
+
+        /* Food Quick-Tags */
+        .food-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .food-type-badge {
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-pill);
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .food-type-badge:hover,
+        .food-type-badge.active {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .food-type-badge.ramadan-badge:hover,
+        .food-type-badge.ramadan-badge.active {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #120e0a;
+            border-color: #fbbf24;
+            font-weight: 700;
+        }
+
+        .food-type-badge.qurbani-badge:hover,
+        .food-type-badge.qurbani-badge.active {
+            background: linear-gradient(135deg, #e11d48, #be123c);
+            color: white;
+            border-color: #fb7185;
+            font-weight: 700;
+        }
+
+        .food-type-badge.blanket-badge:hover,
+        .food-type-badge.blanket-badge.active {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+            border-color: #c4b5fd;
+            font-weight: 700;
+        }
+
+        /* Cart Submit Button Variants */
+        .donate-btn.ramadan-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #120e0a;
+            font-weight: 900;
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
+        }
+        .donate-btn.ramadan-btn:hover {
+            box-shadow: 0 15px 40px rgba(245, 158, 11, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .donate-btn.qurbani-btn {
+            background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+            color: white;
+            font-weight: 800;
+            box-shadow: 0 10px 30px rgba(225, 29, 72, 0.35);
+        }
+        .donate-btn.qurbani-btn:hover {
+            box-shadow: 0 15px 40px rgba(225, 29, 72, 0.55);
+            transform: translateY(-2px);
+        }
+
+        .donate-btn.blanket-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white;
+            font-weight: 800;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.35);
+        }
+        .donate-btn.blanket-btn:hover {
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.55);
+            transform: translateY(-2px);
+        }
+
+        .donate-btn.regular-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            font-weight: 800;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.35);
+        }
+        .donate-btn.regular-btn:hover {
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.55);
+            transform: translateY(-2px);
+        }
+
+        .quantity-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .quantity-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .donate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--secondary) 0%, #EA580C 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: 1.15rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+        }
+
+        .donate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(245, 158, 11, 0.45);
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--primary-light);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        @media (max-width: 850px) {
+            .main-layout { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header glass-panel">
+            <div class="header-left">
+                <a th:href="@{/dashboard}" class="back-btn" title="Back"><i class="fas fa-arrow-left"></i></a>
+                <div class="header-content">
+                    <h1 data-en="Share Food & Warmth" data-bn="খাবার ও বস্ত্র দান করুন">Share Food & Warmth</h1>
+                    <p data-en="List surplus meals, Ramadan Iftar, Qurbani meat, or winter clothes." data-bn="উদ্বৃত্ত খাবার, রমজানের ইফতার, কোরবানির মাংস কিংবা শীতের পোশাক শেয়ার করুন।">
+                        List surplus meals, Ramadan Iftar, Qurbani meat, or winter clothes.
+                    </p>
+                </div>
+            </div>
+            <div class="header-right-actions" style="display: flex; align-items: center; gap: 12px;"></div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Guidelines & Live Points Reward -->
+            <div class="info-panel glass-panel">
+                <div class="reward-preview-card">
+                    <i class="fas fa-trophy" style="font-size: 2rem; color: var(--secondary-light); margin-bottom: 8px;"></i>
+                    <div class="reward-pts-big" id="displayPoints">+10</div>
+                    <div style="font-size: 0.95rem; font-weight: 800; color: white;" id="displayPointLabel" data-en="Karma Points Earned" data-bn="অর্জিত পয়েন্ট">Karma Points Earned</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;" id="displayPointSub" data-en="Base reward for sharing food" data-bn="খাবার শেয়ার করার মূল পয়েন্ট">Base reward for sharing food</div>
+                </div>
+
+                <h2 class="section-title" data-en="Donation Guidelines" data-bn="দান করার নির্দেশিকা">Donation Guidelines</h2>
+                <ul class="tips-list">
+                    <li>
+                        <div class="tip-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="tip-content">
+                            <h4 data-en="Fresh & Hygienic" data-bn="তাজা ও স্বাস্থ্যকর">Fresh & Hygienic</h4>
+                            <p data-en="Only share food that is safe, clean, and nutritious to consume." data-bn="কেবল স্বাস্থ্যসম্মত ও নিরাপদ খাদ্য তালিকায় যুক্ত করুন।">Only share food that is safe, clean, and nutritious to consume.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="tip-icon"><i class="fas fa-box"></i></div>
+                        <div class="tip-content">
+                            <h4 data-en="Clean Packaging" data-bn="পরিষ্কার প্যাকেজিং">Clean Packaging</h4>
+                            <p data-en="Pack food in clean boxes; fold clothes and blankets neatly." data-bn="খাবার বাক্সে এবং কম্বল-পোশাক পরিচ্ছন্নভাবে প্যাক করুন।">Pack food in clean boxes; fold clothes and blankets neatly.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="tip-icon"><i class="fas fa-star"></i></div>
+                        <div class="tip-content">
+                            <h4 data-en="Bonus Campaigns" data-bn="বোনাস ক্যাম্পেইন">Bonus Campaigns</h4>
+                            <p data-en="Ramadan & Qurbani earn +5 bonus; Blankets & Dresses earn 30 points!" data-bn="রমজান ও কোরবানিতে +৫ বোনাস; কম্বল ও পোশাকে ৩০ পয়েন্ট!">Ramadan & Qurbani earn +5 bonus; Blankets & Dresses earn 30 points!</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Form Panel -->
+            <div class="form-panel glass-panel">
+                <div th:if="${error}" class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i><span th:text="${error}">Error</span>
+                </div>
+                <div th:if="${success}" class="alert alert-success">
+                    <i class="fas fa-check-circle"></i><span th:text="${success}">Success</span>
+                </div>
+
+                <form th:action="@{/food/donate}" method="post">
+                    <!-- Hidden field to link donation to request -->
+                    <input type="hidden" name="requestId" th:value="${requestId}">
+
+                    <!-- Dedicated Cart Switcher (আলাদা আলাদা ডোনেশন কার্ট) -->
+                    <div class="cart-switcher-header">
+                        <div class="cart-switcher-title" data-en="Choose Your Donation Cart (Alada Carts):" data-bn="আপনার ডোনেশন কার্ট নির্বাচন করুন (আলাদা কার্ট):">
+                            <i class="fas fa-layer-group"></i> Choose Your Donation Cart (Alada Carts):
+                        </div>
+                        <input type="hidden" name="category" id="selectedCategoryInput" th:value="${campaign != null ? campaign : 'REGULAR'}">
+                        
+                        <div class="cart-tabs-grid">
+                            <!-- Special Ramadan Cart: Active at Ramadan Time Only -->
+                            <div class="cart-select-tab tab-ramadan" data-val="RAMADAN_IFTAR" data-points="15" data-theme="ramadan-theme"
+                                data-notice-en="SPECIAL CART • RAMADAN TIME ONLY" data-notice-bn="বিশেষ কার্ট • শুধুমাত্র মাহে রমজানে ব্যবহারযোগ্য"
+                                data-title-en="Holy Ramadan Special Cart" data-title-bn="পবিত্র মাহে রমজান স্পেশাল কার্ট"
+                                data-desc-en="Dedicated cart active only during the blessed month of Ramadan. Share Iftar and Sehri packages to earn +5 bonus points (15 points total)!"
+                                data-desc-bn="শুধুমাত্র বরকতময় মাহে রমজানের জন্য নির্ধারিত বিশেষ কার্ট। রোজাদারদের জন্য ইফতার ও সেহরি উপহার দিয়ে অর্জন করুন অতিরিক্ত ৫ বোনাস সহ মোট ১৫ পয়েন্ট!"
+                                data-btn-en="Post to Ramadan Cart" data-btn-bn="রমজান কার্টে পোস্ট করুন"
+                                data-btn-class="ramadan-btn" data-icon="fa-moon">
+                                <div class="tab-active-check"><i class="fas fa-check"></i></div>
+                                <i class="fas fa-moon cart-tab-icon"></i>
+                                <span class="cart-tab-name" data-en="Ramadan Cart" data-bn="রমজান কার্ট">Ramadan Cart</span>
+                                <span class="cart-tab-pill">+5 Bonus</span>
+                            </div>
+
+                            <!-- Qurbani Meat Cart -->
+                            <div class="cart-select-tab tab-qurbani" data-val="QURBANI_MEAT" data-points="15" data-theme="qurbani-theme"
+                                data-notice-en="EID-UL-ADHA MEAT CART • +5 BONUS" data-notice-bn="কোরবানি গোশত কার্ট • +৫ বোনাস পয়েন্ট"
+                                data-title-en="Sacred Qurbani Meat Cart" data-title-bn="পবিত্র কোরবানির গোশত কার্ট"
+                                data-desc-en="Distribute clean and hygienic Qurbani meat packages to families in need. Earn +5 bonus points (15 points total)!"
+                                data-desc-bn="কোরবানির তাজা গোশত স্বাস্থ্যসম্মত প্যাকেটে সুবিধাবঞ্চিত মানুষের মাঝে পৌঁছে দিন। অর্জন করুন অতিরিক্ত ৫ বোনাস সহ মোট ১৫ পয়েন্ট!"
+                                data-btn-en="Post to Qurbani Cart" data-btn-bn="কোরবানি কার্টে পোস্ট করুন"
+                                data-btn-class="qurbani-btn" data-icon="fa-drumstick-bite">
+                                <div class="tab-active-check"><i class="fas fa-check"></i></div>
+                                <i class="fas fa-drumstick-bite cart-tab-icon"></i>
+                                <span class="cart-tab-name" data-en="Qurbani Cart" data-bn="কোরবানি কার্ট">Qurbani Cart</span>
+                                <span class="cart-tab-pill">+5 Bonus</span>
+                            </div>
+
+                            <!-- Other Accessories Cart -->
+                            <div class="cart-select-tab tab-blanket" data-val="OTHER_ACCESSORIES" data-points="30" data-theme="blanket-theme"
+                                data-notice-en="OTHER ACCESSORIES &bull; 30 PTS (NO FOOD ITEMS)" data-notice-bn="অন্যান্য এক্সেসরিজ &bull; ৩০ পয়েন্ট (খাবার নয়)"
+                                data-title-en="Other Accessories & Essentials Cart" data-title-bn="অন্যান্য এক্সেসরিজ ও সামগ্রী কার্ট"
+                                data-desc-en="Dedicated non-food cart! Donate warm blankets, clothes, winter wear, shoes, bags, and daily accessories. No food items allowed here! Earn 30 Points!"
+                                data-desc-bn="খাদ্য-বহির্ভূত সামগ্রীর জন্য নির্ধারিত কার্ট: কম্বল, শীতবস্ত্র, পোশাক, জুতা, স্কুল ব্যাগ ও নিত্যপ্রয়োজনীয় সামগ্রী। এখানে কোনো খাদ্য নয়! অর্জন করুন ৩০ পয়েন্ট!"
+                                data-btn-en="Post to Other Accessories Cart" data-btn-bn="অন্যান্য এক্সেসরিজ কার্টে পোস্ট করুন"
+                                data-btn-class="blanket-btn" data-icon="fa-box-open">
+                                <div class="tab-active-check"><i class="fas fa-check"></i></div>
+                                <i class="fas fa-box-open cart-tab-icon"></i>
+                                <span class="cart-tab-name" data-en="Other Accessories" data-bn="অন্যান্য এক্সেসরিজ">Other Accessories</span>
+                                <span class="cart-tab-pill">30 Pts!</span>
+                            </div>
+
+                            <!-- Regular Food Cart -->
+                            <div class="cart-select-tab tab-regular active" data-val="REGULAR" data-points="10" data-theme="regular-theme"
+                                data-notice-en="DAILY SURPLUS MEAL CART" data-notice-bn="দৈনিক উদ্বৃত্ত খাদ্য কার্ট"
+                                data-title-en="Daily Surplus Meal Cart" data-title-bn="দৈনিক উদ্বৃত্ত খাবার কার্ট"
+                                data-desc-en="Prevent food waste from homes and eateries. Share fresh, nutritious meals and earn 10 Karma Points."
+                                data-desc-bn="বাসাবাড়ি ও বিভিন্ন অনুষ্ঠানের অতিরিক্ত তাজা খাবার অপচয় না করে অভাবী মানুষদের দান করুন। অর্জন করুন ১০ কার্মা পয়েন্ট।"
+                                data-btn-en="Post Food Cart" data-btn-bn="খাবার কার্টে পোস্ট করুন"
+                                data-btn-class="regular-btn" data-icon="fa-utensils">
+                                <div class="tab-active-check"><i class="fas fa-check"></i></div>
+                                <i class="fas fa-utensils cart-tab-icon"></i>
+                                <span class="cart-tab-name" data-en="Regular Food" data-bn="সাধারণ খাবার">Regular Food</span>
+                                <span class="cart-tab-pill">10 Pts</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dedicated Active Cart Banner Hero -->
+                    <div class="active-cart-hero regular-theme" id="activeCartHero">
+                        <div class="cart-time-notice" id="heroNotice">
+                            <i class="fas fa-utensils" id="heroNoticeIcon"></i>
+                            <span id="heroNoticeText" data-en="DAILY SURPLUS MEAL CART" data-bn="দৈনিক উদ্বৃত্ত খাদ্য কার্ট">DAILY SURPLUS MEAL CART</span>
+                        </div>
+                        <h2 class="active-cart-title" id="heroTitle" data-en="Daily Surplus Meal Cart" data-bn="দৈনিক উদ্বৃত্ত খাবার কার্ট">Daily Surplus Meal Cart</h2>
+                        <p class="active-cart-desc" id="heroDesc" data-en="Prevent food waste from homes and eateries. Share fresh, nutritious meals and earn 10 Karma Points." data-bn="বাসাবাড়ি ও বিভিন্ন অনুষ্ঠানের অতিরিক্ত তাজা খাবার অপচয় না করে অভাবী মানুষদের দান করুন। অর্জন করুন ১০ কার্মা পয়েন্ট।">
+                            Prevent food waste from homes and eateries. Share fresh, nutritious meals and earn 10 Karma Points.
+                        </p>
+                    </div>
+
+                    <!-- Item Name -->
+                    <div class="form-group">
+                        <label class="form-label" id="itemNameLabel" data-en="Food / Item Name" data-bn="খাবার বা সামগ্রীর নাম">
+                            <i class="fas fa-hamburger" style="color: var(--secondary);"></i> Food / Item Name
+                        </label>
+                        <input type="text" name="foodName" id="foodNameInput" class="form-control" placeholder="e.g., Chicken Biryani, Iftar Box, or Winter Blanket"
+                            required data-placeholder-en="e.g., Chicken Biryani, Iftar Box, or Winter Blanket" data-placeholder-bn="যেমন: বিরিয়ানি, ইফতার প্যাকেট, কিংবা শীতের কম্বল"
+                            th:value="${targetRequest != null ? targetRequest.foodName : (donation?.foodName)}">
+                        
+                        <div class="quick-suggest-header">
+                            <i class="fas fa-magic" style="color: var(--secondary-light);"></i>
+                            <span data-en="Tap any item below to autofill instantly:" data-bn="স্বয়ংক্রিয় পূরণের জন্য যেকোনো আইটেমে ট্যাপ করুন:">Tap any item below to autofill instantly:</span>
+                        </div>
+                        <div class="food-types" id="quickTags">
+                            <span class="food-type-badge" data-food="Chicken Biryani">Chicken Biryani</span>
+                            <span class="food-type-badge" data-food="Rice & Chicken Curry">Rice & Chicken Curry</span>
+                            <span class="food-type-badge" data-food="Bhuna Khichuri & Egg">Bhuna Khichuri & Egg</span>
+                            <span class="food-type-badge" data-food="Fresh Roti & Sabji">Fresh Roti & Sabji</span>
+                            <span class="food-type-badge" data-food="Vegetables & Dal">Vegetables & Dal</span>
+                            <span class="food-type-badge" data-food="Fish & Rice">Fish & Rice</span>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label class="form-label" data-en="Description (Optional)" data-bn="বিবরণ (ঐচ্ছিক)">
+                            <i class="fas fa-align-left" style="color: var(--secondary);"></i> Description (Optional)
+                        </label>
+                        <textarea name="description" class="form-control"
+                            placeholder="Add specifics (e.g. 5 boxes packaged hot, or 2 thick blankets)..."
+                            data-placeholder-en="Add specifics (e.g. 5 boxes packaged hot, or 2 thick blankets)..."
+                            data-placeholder-bn="বিস্তারিত তথ্য দিন (যেমন: ৫টি গরম খাবারের বক্স, অথবা ২টি মোটা কম্বল)..."
+                            style="min-height: 90px;"
+                            th:text="${donation?.description}"></textarea>
+                    </div>
+
+                    <!-- Quantity & Area -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" id="qtyLabel" data-en="Quantity (Servings / Items)" data-bn="পরিমাণ (প্যাকেট / সামগ্রী)">
+                                <i class="fas fa-cubes" style="color: var(--secondary);"></i> Quantity (Servings / Items)
+                            </label>
+                            <div class="quantity-container">
+                                <button type="button" class="quantity-btn" id="decrease-qty"><i class="fas fa-minus"></i></button>
+                                <input type="number" id="quantity" name="quantity" class="form-control"
+                                    style="text-align: center;" min="1" max="500" value="4" required
+                                    th:value="${targetRequest != null ? targetRequest.quantity : (donation?.quantity ?: 4)}">
+                                <button type="button" class="quantity-btn" id="increase-qty"><i class="fas fa-plus"></i></button>
+                            </div>
+                            <div class="qty-presets-row" id="qtyPresets">
+                                <button type="button" class="qty-preset-chip" data-qty="2">2</button>
+                                <button type="button" class="qty-preset-chip" data-qty="5">5</button>
+                                <button type="button" class="qty-preset-chip" data-qty="10">10</button>
+                                <button type="button" class="qty-preset-chip" data-qty="20">20</button>
+                                <button type="button" class="qty-preset-chip" data-qty="50">50</button>
+                                <button type="button" class="qty-preset-chip" data-qty="100">100</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-en="Area / Location" data-bn="এলাকা বা লোকেশন">
+                                <i class="fas fa-map-marker-alt" style="color: var(--secondary);"></i> Area / Location
+                            </label>
+                            <input type="text" name="location" list="dhaka-areas" class="form-control" placeholder="e.g., Dhanmondi, Gulshan, UIU Campus"
+                                required data-placeholder-en="e.g., Dhanmondi, Gulshan, UIU Campus" data-placeholder-bn="যেমন: ধানমন্ডি, গুলশান, ইউআইইউ ক্যাম্পাস"
+                                th:value="${donation?.location ?: user?.address}">
+                            <datalist id="dhaka-areas">
+                                <option value="Dhanmondi, Dhaka">
+                                <option value="Gulshan, Dhaka">
+                                <option value="Banani, Dhaka">
+                                <option value="Mirpur, Dhaka">
+                                <option value="Uttara, Dhaka">
+                                <option value="Mohammadpur, Dhaka">
+                                <option value="Badda, Dhaka">
+                                <option value="UIU Campus, Madani Avenue">
+                                <option value="Old Dhaka (Puran Dhaka)">
+                                <option value="Khilgaon, Dhaka">
+                                <option value="Bashundhara R/A, Dhaka">
+                            </datalist>
+                        </div>
+                    </div>
+
+                    <!-- Cook Time & Expire Time (Hidden for Blanket, Clothes & Others) -->
+                    <div class="form-row" id="cookExpireRow">
+                        <div class="form-group">
+                            <label class="form-label" id="timeLabel1" data-en="Cook / Prepared Time" data-bn="রান্না বা প্রস্তুতের সময়">
+                                <i class="fas fa-clock" style="color: var(--secondary);"></i> Cook / Prepared Time
+                            </label>
+                            <input type="datetime-local" id="cookTimeInput" name="cookTime" class="form-control" required
+                                th:value="${donation?.cookTime}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" id="timeLabel2" data-en="Expire / Pickup Deadline" data-bn="মেয়াদ উত্তীর্ণ বা গ্রহণের শেষ সময়">
+                                <i class="fas fa-hourglass-end" style="color: var(--secondary);"></i> Expire / Pickup Deadline
+                            </label>
+                            <input type="datetime-local" id="expireTimeInput" name="expireTime" class="form-control" required
+                                th:value="${donation?.expireTime}">
+                        </div>
+                    </div>
+
+                    <!-- Non-Food Notice (Shown for Others / Blanket & Clothes) -->
+                    <div class="non-food-notice" id="nonFoodNotice" style="display: none; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 16px; padding: 14px 20px; margin-bottom: 24px; align-items: center; gap: 14px; color: #e9d5ff;">
+                        <i class="fas fa-box-open" style="color: #c084fc; font-size: 1.4rem;"></i>
+                        <div>
+                            <strong style="color: #ffffff; display: block; font-size: 0.95rem; margin-bottom: 3px;" data-en="Non-Food Donation &bull; No Cooking or Expiry Time" data-bn="খাদ্য-বহির্ভূত সামগ্রী &bull; রান্নার বা মেয়াদোত্তীর্ণের সময় নেই">Non-Food Donation &bull; No Cooking or Expiry Time</strong>
+                            <span style="font-size: 0.85rem; color: #ddd6fe;" data-en="Blankets, clothes, winter wear, and other items do not require cook time or expire time." data-bn="কম্বল, পোশাক, শীতবস্ত্র ও অন্যান্য সামগ্রীর জন্য কোনো রান্নার বা মেয়াদ উত্তীর্ণের সময় প্রয়োজন নেই।">Blankets, clothes, winter wear, and other items do not require cook time or expire time.</span>
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="form-group">
+                        <label class="form-label" data-en="Contact Phone (Optional)" data-bn="যোগাযোগের ফোন নম্বর (ঐচ্ছিক)">
+                            <i class="fas fa-phone" style="color: var(--secondary);"></i> Contact Phone (Optional)
+                        </label>
+                        <input type="tel" name="contactPhone" class="form-control" placeholder="01XXXXXXXXX"
+                            th:value="${donation?.contactPhone ?: user?.phone}">
+                    </div>
+
+                    <button type="submit" class="donate-btn regular-btn" id="submitDonationBtn">
+                        <i class="fas fa-paper-plane" id="submitBtnIcon"></i>
+                        <span id="submitBtnText" data-en="Post Food Cart" data-bn="খাবার কার্টে পোস্ট করুন">Post Food Cart</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global JavaScript with bilingual and live notifications engine -->
+    <script th:src="@{/js/global.js}"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // Auto-fill dates
+            const now = new Date();
+            const expire = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+
+            function format(date) {
+                const pad = (n) => n.toString().padStart(2, '0');
+                return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+            }
+
+            const cookInput = document.querySelector('input[name="cookTime"]');
+            const expireInput = document.querySelector('input[name="expireTime"]');
+
+            if (cookInput && !cookInput.value) cookInput.value = format(now);
+            if (expireInput && !expireInput.value) expireInput.value = format(expire);
+
+            // Stepper
+            const qty = document.getElementById('quantity');
+            document.getElementById('decrease-qty')?.addEventListener('click', () => { if (qty.value > 1) qty.value--; });
+            document.getElementById('increase-qty')?.addEventListener('click', () => { if (qty.value < 500) qty.value++; });
+
+            // Quantity presets
+            document.querySelectorAll('.qty-preset-chip').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    document.querySelectorAll('.qty-preset-chip').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    if (qty) qty.value = this.getAttribute('data-qty');
+                });
+            });
+
+            // Dedicated Cart Switching Elements
+            const categoryInput = document.getElementById('selectedCategoryInput');
+            const displayPoints = document.getElementById('displayPoints');
+            const displayPointLabel = document.getElementById('displayPointLabel');
+            const displayPointSub = document.getElementById('displayPointSub');
+            const tabs = document.querySelectorAll('.cart-select-tab');
+            const activeHero = document.getElementById('activeCartHero');
+            const heroNoticeText = document.getElementById('heroNoticeText');
+            const heroNoticeIcon = document.getElementById('heroNoticeIcon');
+            const heroTitle = document.getElementById('heroTitle');
+            const heroDesc = document.getElementById('heroDesc');
+            const submitBtn = document.getElementById('submitDonationBtn');
+            const submitBtnIcon = document.getElementById('submitBtnIcon');
+            const submitBtnText = document.getElementById('submitBtnText');
+            const quickTagsContainer = document.getElementById('quickTags');
+            const foodNameInput = document.getElementById('foodNameInput');
+            const itemNameLabel = document.getElementById('itemNameLabel');
+            const timeLabel1 = document.getElementById('timeLabel1');
+            const timeLabel2 = document.getElementById('timeLabel2');
+
+            // Quick tag datasets per cart (Strictly isolated: specials separate, non-food separate)
+            const cartQuickTags = {
+                'RAMADAN_IFTAR': [
+                    { name: 'Iftar Box with Dates & Halim (ইফতার বক্স ও হালিম)', icon: 'fas fa-box-open', cls: 'ramadan-badge' },
+                    { name: 'Wholesome Sehri Pack (সেহরি প্যাকেট)', icon: 'fas fa-moon', cls: 'ramadan-badge' },
+                    { name: 'Premium Dates (খেজুর প্যাকেট)', icon: 'fas fa-apple-alt', cls: 'ramadan-badge' },
+                    { name: 'Halim & Khichuri Pack (হালিম ও খিচুড়ি)', icon: 'fas fa-bowl-food', cls: 'ramadan-badge' },
+                    { name: 'Ramadan Family Ration Box (ইফতার রেশন)', icon: 'fas fa-cubes-stacked', cls: 'ramadan-badge' },
+                    { name: 'Fresh Iftar Fruits Box (ইফতার ফলমূল)', icon: 'fas fa-lemon', cls: 'ramadan-badge' }
+                ],
+                'QURBANI_MEAT': [
+                    { name: 'Fresh Qurbani Beef (কোরবানির গরুর গোশত)', icon: 'fas fa-drumstick-bite', cls: 'qurbani-badge' },
+                    { name: 'Fresh Qurbani Mutton Pack (খাসির গোশত)', icon: 'fas fa-drumstick-bite', cls: 'qurbani-badge' },
+                    { name: 'Clean Meat Distribution Box (গোশত বিতরণ বক্স)', icon: 'fas fa-box', cls: 'qurbani-badge' },
+                    { name: 'Cooked Qurbani Meat (রান্না করা কোরবানির মাংস)', icon: 'fas fa-utensils', cls: 'qurbani-badge' },
+                    { name: 'Eid Meat Share Pack (ঈদের গোশত শেয়ারিং)', icon: 'fas fa-hand-holding-heart', cls: 'qurbani-badge' }
+                ],
+                'OTHER_ACCESSORIES': [
+                    { name: 'Thick Warm Blanket (ভারী শীতের কম্বল)', icon: 'fas fa-snowflake', cls: 'blanket-badge' },
+                    { name: 'Warm Jacket / Sweater (সোয়েটার ও জ্যাকেট)', icon: 'fas fa-tshirt', cls: 'blanket-badge' },
+                    { name: 'Children Warm Clothes (শিশুদের শীতবস্ত্র)', icon: 'fas fa-child', cls: 'blanket-badge' },
+                    { name: 'Saree & Lungi (নতুন শাড়ি ও লুঙ্গি)', icon: 'fas fa-vest', cls: 'blanket-badge' },
+                    { name: 'Warm Shawl / Chador (উলের চাদর)', icon: 'fas fa-scroll', cls: 'blanket-badge' },
+                    { name: 'Shoes & Slippers (জুতা ও স্যান্ডেল)', icon: 'fas fa-shoe-prints', cls: 'blanket-badge' },
+                    { name: 'School Bag & Stationery (স্কুল ব্যাগ ও বইখাতা)', icon: 'fas fa-backpack', cls: 'blanket-badge' },
+                    { name: 'Daily Hygiene & Essentials (নিত্যপ্রয়োজনীয় সামগ্রী)', icon: 'fas fa-pump-soap', cls: 'blanket-badge' },
+                    { name: 'Other Accessories & Goods (অন্যান্য সামগ্রী)', icon: 'fas fa-box-open', cls: 'blanket-badge' }
+                ],
+                'BLANKET_DRESS': [
+                    { name: 'Thick Warm Blanket (ভারী শীতের কম্বল)', icon: 'fas fa-snowflake', cls: 'blanket-badge' },
+                    { name: 'Warm Jacket / Sweater (সোয়েটার ও জ্যাকেট)', icon: 'fas fa-tshirt', cls: 'blanket-badge' },
+                    { name: 'Children Warm Clothes (শিশুদের শীতবস্ত্র)', icon: 'fas fa-child', cls: 'blanket-badge' },
+                    { name: 'Saree & Lungi (নতুন শাড়ি ও লুঙ্গি)', icon: 'fas fa-vest', cls: 'blanket-badge' },
+                    { name: 'Warm Shawl / Chador (উলের চাদর)', icon: 'fas fa-scroll', cls: 'blanket-badge' },
+                    { name: 'Shoes & Slippers (জুতা ও স্যান্ডেল)', icon: 'fas fa-shoe-prints', cls: 'blanket-badge' },
+                    { name: 'School Bag & Stationery (স্কুল ব্যাগ ও বইখাতা)', icon: 'fas fa-backpack', cls: 'blanket-badge' },
+                    { name: 'Daily Hygiene & Essentials (নিত্যপ্রয়োজনীয় সামগ্রী)', icon: 'fas fa-pump-soap', cls: 'blanket-badge' },
+                    { name: 'Other Accessories & Goods (অন্যান্য সামগ্রী)', icon: 'fas fa-box-open', cls: 'blanket-badge' }
+                ],
+                'REGULAR': [
+                    { name: 'Chicken Biryani (চিকেন বিরিয়ানি)', icon: 'fas fa-drumstick-bite', cls: '' },
+                    { name: 'Rice & Chicken Curry (ভাত ও মুরগির মাংস)', icon: 'fas fa-bowl-rice', cls: '' },
+                    { name: 'Bhuna Khichuri & Egg (ভুনা খিচুড়ি ও ডিম)', icon: 'fas fa-bowl-food', cls: '' },
+                    { name: 'Fresh Roti & Sabji (তাজা রুটি ও সবজি)', icon: 'fas fa-bread-slice', cls: '' },
+                    { name: 'Fresh Vegetables & Dal (সবজি ও ডাল)', icon: 'fas fa-carrot', cls: '' },
+                    { name: 'Fish Curry & Rice (মাছ ও ভাত)', icon: 'fas fa-fish', cls: '' },
+                    { name: 'Evening Snacks & Bakery (নাস্তা ও বেকারি)', icon: 'fas fa-cookie-bite', cls: '' }
+                ]
+            };
+
+            function renderQuickTags(val) {
+                const tags = cartQuickTags[val] || cartQuickTags['REGULAR'];
+                quickTagsContainer.innerHTML = '';
+                tags.forEach(t => {
+                    const badge = document.createElement('span');
+                    badge.className = 'food-type-badge ' + (t.cls || '');
+                    badge.setAttribute('data-food', t.name);
+                    badge.innerHTML = `<i class="${t.icon}"></i> ${t.name}`;
+                    badge.addEventListener('click', function () {
+                        document.querySelectorAll('.food-type-badge').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        foodNameInput.value = t.name;
+                    });
+                    quickTagsContainer.appendChild(badge);
+                });
+            }
+
+            function applyDedicatedCart(tab) {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const val = tab.getAttribute('data-val');
+                const pts = tab.getAttribute('data-points');
+                const theme = tab.getAttribute('data-theme');
+                const noticeEn = tab.getAttribute('data-notice-en');
+                const noticeBn = tab.getAttribute('data-notice-bn');
+                const titleEn = tab.getAttribute('data-title-en');
+                const titleBn = tab.getAttribute('data-title-bn');
+                const descEn = tab.getAttribute('data-desc-en');
+                const descBn = tab.getAttribute('data-desc-bn');
+                const btnEn = tab.getAttribute('data-btn-en');
+                const btnBn = tab.getAttribute('data-btn-bn');
+                const btnCls = tab.getAttribute('data-btn-class');
+                const icon = tab.getAttribute('data-icon');
+
+                categoryInput.value = val;
+
+                // Update Hero Banner
+                activeHero.className = 'active-cart-hero ' + theme;
+                heroNoticeText.setAttribute('data-en', noticeEn);
+                heroNoticeText.setAttribute('data-bn', noticeBn);
+                heroNoticeIcon.className = 'fas ' + icon;
+
+                heroTitle.setAttribute('data-en', titleEn);
+                heroTitle.setAttribute('data-bn', titleBn);
+
+                heroDesc.setAttribute('data-en', descEn);
+                heroDesc.setAttribute('data-bn', descBn);
+
+                // Update Reward Display
+                displayPoints.textContent = '+' + pts;
+
+                // Update Submit Button
+                submitBtn.className = 'donate-btn ' + btnCls;
+                submitBtnIcon.className = 'fas ' + icon;
+                submitBtnText.setAttribute('data-en', btnEn);
+                submitBtnText.setAttribute('data-bn', btnBn);
+
+                // Render dynamic quick tags
+                renderQuickTags(val);
+
+                const cookExpireRow = document.getElementById('cookExpireRow');
+                const nonFoodNotice = document.getElementById('nonFoodNotice');
+
+                // Contextual adjustments
+                if (val === 'RAMADAN_IFTAR') {
+                    displayPoints.style.color = 'var(--secondary-light)';
+                    displayPointLabel.setAttribute('data-en', 'Ramadan Karma (+5 Bonus)');
+                    displayPointLabel.setAttribute('data-bn', 'রমজান কার্মা (+৫ বোনাস)');
+                    displayPointSub.setAttribute('data-en', '10 Base + 5 Ramadan Blessing Bonus');
+                    displayPointSub.setAttribute('data-bn', '১০ মূল পয়েন্ট + ৫ মাহে রমজান বোনাস');
+
+                    itemNameLabel.setAttribute('data-en', 'Ramadan Iftar / Sehri Item Name');
+                    itemNameLabel.setAttribute('data-bn', 'রমজানের ইফতার বা সেহরি সামগ্রীর নাম');
+                    foodNameInput.placeholder = 'e.g., Iftar Box (Dates, Halim, Jilapi, Fruits) or Sehri Pack';
+
+                    if (cookExpireRow) cookExpireRow.style.display = 'flex';
+                    if (nonFoodNotice) nonFoodNotice.style.display = 'none';
+                    if (cookInput) {
+                        cookInput.setAttribute('required', 'required');
+                        if (!cookInput.value) cookInput.value = format(new Date());
+                    }
+                    if (expireInput) {
+                        expireInput.setAttribute('required', 'required');
+                        if (!expireInput.value) expireInput.value = format(new Date(Date.now() + 8 * 60 * 60 * 1000));
+                    }
+
+                    timeLabel1.setAttribute('data-en', 'Iftar / Sehri Preparation Time');
+                    timeLabel1.setAttribute('data-bn', 'ইফতার বা সেহরি প্রস্তুতের সময়');
+                    timeLabel2.setAttribute('data-en', 'Pickup Before (Iftar/Sehri Deadline)');
+                    timeLabel2.setAttribute('data-bn', 'গ্রহণের শেষ সময় (ইফতার/সেহরির পূর্বে)');
+                } else if (val === 'QURBANI_MEAT') {
+                    displayPoints.style.color = '#fb7185';
+                    displayPointLabel.setAttribute('data-en', 'Qurbani Karma (+5 Bonus)');
+                    displayPointLabel.setAttribute('data-bn', 'কোরবানি কার্মা (+৫ বোনাস)');
+                    displayPointSub.setAttribute('data-en', '10 Base + 5 Eid-ul-Adha Meat Bonus');
+                    displayPointSub.setAttribute('data-bn', '১০ মূল পয়েন্ট + ৫ কোরবানি বোনাস');
+
+                    itemNameLabel.setAttribute('data-en', 'Qurbani Meat Pack Name');
+                    itemNameLabel.setAttribute('data-bn', 'কোরবানির গোশত প্যাকেটের বিবরণ');
+                    foodNameInput.placeholder = 'e.g., Fresh Qurbani Beef / Mutton Pack (2-3 kg)';
+
+                    if (cookExpireRow) cookExpireRow.style.display = 'flex';
+                    if (nonFoodNotice) nonFoodNotice.style.display = 'none';
+                    if (cookInput) {
+                        cookInput.setAttribute('required', 'required');
+                        if (!cookInput.value) cookInput.value = format(new Date());
+                    }
+                    if (expireInput) {
+                        expireInput.setAttribute('required', 'required');
+                        if (!expireInput.value) expireInput.value = format(new Date(Date.now() + 8 * 60 * 60 * 1000));
+                    }
+
+                    timeLabel1.setAttribute('data-en', 'Cutting & Packaging Time');
+                    timeLabel1.setAttribute('data-bn', 'কাটিং ও প্যাকেজিং এর সময়');
+                    timeLabel2.setAttribute('data-en', 'Pickup Deadline (Maintain Cold Chain)');
+                    timeLabel2.setAttribute('data-bn', 'গ্রহণের শেষ সময় (তাজা থাকার মেয়াদ)');
+                } else if (val === 'OTHER_ACCESSORIES' || val === 'BLANKET_DRESS' || val.includes('OTHER') || val.includes('ACCESSOR')) {
+                    displayPoints.style.color = '#c4b5fd';
+                    displayPointLabel.setAttribute('data-en', 'Other Accessories Reward');
+                    displayPointLabel.setAttribute('data-bn', 'অন্যান্য এক্সেসরিজ পুরস্কার');
+                    displayPointSub.setAttribute('data-en', 'Hero Award: 30 Points per donation!');
+                    displayPointSub.setAttribute('data-bn', 'হিরো পুরস্কার: প্রতি দানে সর্বোচ্চ ৩০ পয়েন্ট!');
+
+                    itemNameLabel.setAttribute('data-en', 'Accessory / Non-Food Item Name');
+                    itemNameLabel.setAttribute('data-bn', 'এক্সেসরিজ বা সামগ্রীর নাম (খাবার নয়)');
+                    foodNameInput.placeholder = 'e.g., Warm Winter Blanket, Children Clothes, Shoes, School Bag, or Daily Essentials';
+
+                    // Others / Blanket section has NO cook time and NO expire time!
+                    if (cookExpireRow) cookExpireRow.style.display = 'none';
+                    if (nonFoodNotice) nonFoodNotice.style.display = 'flex';
+                    if (cookInput) {
+                        cookInput.removeAttribute('required');
+                        cookInput.value = '';
+                    }
+                    if (expireInput) {
+                        expireInput.removeAttribute('required');
+                        expireInput.value = '';
+                    }
+                } else {
+                    displayPoints.style.color = 'var(--secondary-light)';
+                    displayPointLabel.setAttribute('data-en', 'Standard Food Reward');
+                    displayPointLabel.setAttribute('data-bn', 'সাধারণ খাদ্য পুরস্কার');
+                    displayPointSub.setAttribute('data-en', 'Base 10 Karma Points for eliminating waste');
+                    displayPointSub.setAttribute('data-bn', 'অপচয় রোধে সাধারণ ১০ কার্মা পয়েন্ট');
+
+                    itemNameLabel.setAttribute('data-en', 'Cooked Meal / Food Name');
+                    itemNameLabel.setAttribute('data-bn', 'রান্না করা খাবার বা খাদ্য সামগ্রীর নাম');
+                    foodNameInput.placeholder = 'e.g., Chicken Biryani, Cooked Rice, Vegetables';
+
+                    if (cookExpireRow) cookExpireRow.style.display = 'flex';
+                    if (nonFoodNotice) nonFoodNotice.style.display = 'none';
+                    if (cookInput) {
+                        cookInput.setAttribute('required', 'required');
+                        if (!cookInput.value) cookInput.value = format(new Date());
+                    }
+                    if (expireInput) {
+                        expireInput.setAttribute('required', 'required');
+                        if (!expireInput.value) expireInput.value = format(new Date(Date.now() + 8 * 60 * 60 * 1000));
+                    }
+
+                    timeLabel1.setAttribute('data-en', 'Cook / Prepared Time');
+                    timeLabel1.setAttribute('data-bn', 'রান্না বা প্রস্তুতের সময়');
+                    timeLabel2.setAttribute('data-en', 'Expire / Pickup Deadline');
+                    timeLabel2.setAttribute('data-bn', 'মেয়াদ উত্তীর্ণ বা গ্রহণের শেষ সময়');
+                }
+
+                // Refresh bilingual text if global engine active
+                if (typeof window.applyCurrentLanguage === 'function') {
+                    window.applyCurrentLanguage();
+                }
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => applyDedicatedCart(tab));
+            });
+
+            // Form submission safety: clear cookTime and expireTime for non-food
+            const donationForm = document.querySelector('form');
+            if (donationForm) {
+                donationForm.addEventListener('submit', function () {
+                    const currentCategory = categoryInput ? categoryInput.value : '';
+                    if (currentCategory === 'OTHER_ACCESSORIES' || currentCategory === 'BLANKET_DRESS' || currentCategory.includes('OTHER') || currentCategory.includes('ACCESSOR')) {
+                        if (cookInput) {
+                            cookInput.removeAttribute('required');
+                            cookInput.value = '';
+                        }
+                        if (expireInput) {
+                            expireInput.removeAttribute('required');
+                            expireInput.value = '';
+                        }
+                    }
+                });
+            }
+
+            // Preset campaign from URL or backend model
+            const urlParams = new URLSearchParams(window.location.search);
+            const campaignParam = urlParams.get('campaign') || [[${campaign}]];
+            if (campaignParam) {
+                const searchKey = campaignParam.toUpperCase();
+                const matchTab = Array.from(tabs).find(t => {
+                    const v = t.getAttribute('data-val');
+                    return v === searchKey || v.includes(searchKey) || searchKey.includes(v.split('_')[0]) || (searchKey.includes('OTHER') && v.includes('OTHER')) || (searchKey.includes('ACCESSOR') && v.includes('OTHER'));
+                });
+                if (matchTab) {
+                    applyDedicatedCart(matchTab);
+                } else {
+                    applyDedicatedCart(tabs[3]); // default regular
+                }
+            } else {
+                applyDedicatedCart(tabs[3]); // default regular
+            }
+        });
+    </script>
+</body>
+
+</html>
